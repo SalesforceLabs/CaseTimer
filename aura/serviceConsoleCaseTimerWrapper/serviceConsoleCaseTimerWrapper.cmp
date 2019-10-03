@@ -1,0 +1,36 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <!-- console navigation variables -->
+    <aura:attribute name="consoleTabId" type="String"/>
+    <aura:attribute name="tabFocused" type="Boolean"/>
+    
+    <!-- serviceConsoleCaseTimer lwc design attributes -->
+    <aura:attribute name="hideCmpVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="cmpHeaderVar" type="String" default="Session Timer" access="global"/>   
+    <aura:attribute name="hideClockVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="allowManualVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="autoStartVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="pausedVar" type="Boolean"/>
+    <aura:attribute name="maintabClosed" type="Boolean" default="false"/>
+
+    
+    
+    
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="lightning:tabCreated" action="{! c.onTabCreated }"/>
+    <aura:handler event="lightning:tabFocused" action="{! c.onTabFocused }"/>
+    <aura:handler event="lightning:tabUpdated" action="{! c.onTabUpdated }"/>
+    <aura:handler event="lightning:tabReplaced" action="{! c.onTabReplaced }"/>
+    <aura:handler event="lightning:tabClosed" action="{! c.onTabClosed }"/>
+    
+    <c:serviceConsoleCaseTimer onpassingagentid="{!c.parentreceivedid}"
+                               recordId="{!v.recordId}"
+                               hideCmp="{!v.hideCmpVar}"
+                               cmpHeader="{!v.cmpHeaderVar}"
+                               hideClock="{!v.hideClockVar}"
+                               allowManual="{!v.allowManualVar}"
+                               autoStart="{!v.autoStartVar}"
+                               paused="{!v.pausedVar}" 
+                               tabclosed="{!v.maintabClosed}"/>
+</aura:component>

@@ -1,0 +1,10 @@
+<design:component label="Case Timer">
+    <design:attribute name="cmpHeaderVar" label="Component Header"/>   
+    <design:attribute name="hideCmpVar" label="Hide Component?" default="false"/>
+    <design:attribute name="hideClockVar" label="Hide Component Clock?" default="false"/>
+    <design:attribute name="allowManualVar" label="Allow Manual Logging?" default="false"/>
+    <design:attribute name="autoStartVar" label="Start timer automatically" default="false"/>
+    <sfdc:objects>
+        <sfdc:object>Case</sfdc:object>
+    </sfdc:objects>
+</design:component>

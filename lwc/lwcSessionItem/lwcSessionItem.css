@@ -1,0 +1,34 @@
+:host {
+    display:table-row;
+    counter-increment: row-number;
+}
+.agentname {
+    color: rgb(0, 109, 204);
+    text-decoration: none;
+    cursor: pointer;
+}
+ 
+
+.numCol {
+    width: 2.75rem;
+    text-align: center;
+}
+
+.rowClass {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mockBtn {
+    border:none !important;
+    outline:none !important;
+    box-shadow:none !important;
+}
+
+.mockBtn:focus,
+.mockBtn:active,
+.mockBtn:hover {
+    outline:none !important;
+    box-shadow:none !important;
+    text-decoration:underline;
+}
