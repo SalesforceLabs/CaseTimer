@@ -57,6 +57,20 @@
         } 
     },
     
+    onTabReplaced : function(component, event, helper) {
+        var currentTab = component.get("v.consoleTabId");
+        var replacedTabId = event.getParam('tabId');
+        var workspaceAPI = component.find("workspace");
+        
+        if (replacedTabId == currentTab) {
+            component.set('v.tabFocused', true);
+            component.set('v.pausedVar', false);
+        } else {
+            component.set('v.tabFocused', false);
+            component.set('v.pausedVar', true);
+        } 
+    },
+    
     onTabClosed : function(component, event, helper) {
         var currentTab = component.get("v.consoleTabId");
         var tabId = event.getParam('tabId');
