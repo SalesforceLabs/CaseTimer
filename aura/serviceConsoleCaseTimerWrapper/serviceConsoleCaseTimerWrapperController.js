@@ -8,9 +8,9 @@
         }else{
             component.set('v.pausedVar', true);
         }
-        workspaceAPI.getFocusedTabInfo().then(function(response) {
-            var focusedTabId = response.tabId;            
-            component.set('v.consoleTabId', focusedTabId);
+        workspaceAPI.getEnclosingTabId().then(function(response){
+            var enclosingTabId = response;
+            component.set('v.consoleTabId', enclosingTabId);
             component.set('v.tabFocused', true);
         })
     },
