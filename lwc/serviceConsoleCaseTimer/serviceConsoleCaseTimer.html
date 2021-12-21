@@ -26,7 +26,7 @@
             </div>
             <div class="center" if:false={hasAccess}>
                 <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Access required" slot="title">Access Required</h1>
-                <p class="slds-text-body_small mediumWeight slds-line-height_reset">{accessMessage}</p>
+                <p class="slds-text-body_small mediumWeight slds-line-height_reset">{accessMessage}<br /> <br />Please contact your administrator</p>
             </div>
             <div class="tableCont slds-scrollable--y" if:true={hasAccess}>
                 <table class="slds-table slds-table--bordered slds-table--fixed-layout fullWidth">
