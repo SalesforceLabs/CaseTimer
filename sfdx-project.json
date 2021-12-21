@@ -1,0 +1,17 @@
+{
+  "packageDirectories": [
+    { "path": "aura" },
+    { "path": "classes" },
+    { "path": "customMetadata" },
+    { "path": "layouts"  },
+    { "path": "lwc" },
+    { "path": "objects" },
+    { "path": "permissionsets" },
+    { "path": "staticresources" },
+    { "path": "tabs" }
+  ],
+  "name": "CaseTimer",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "52.0"
+}

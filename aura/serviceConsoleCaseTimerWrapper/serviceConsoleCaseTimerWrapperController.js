@@ -8,17 +8,18 @@
         }else{
             component.set('v.pausedVar', true);
         }
-        workspaceAPI.getFocusedTabInfo().then(function(response) {
-            var focusedTabId = response.tabId;            
-            component.set('v.consoleTabId', focusedTabId);
+        workspaceAPI.getEnclosingTabId().then(function(response){
+            var enclosingTabId = response;
+            console.log("TabID: " + enclosingTabId);
+            component.set('v.consoleTabId', enclosingTabId);
             component.set('v.tabFocused', true);
         })
     },
     
     onTabCreated : function(component, event, helper) {
+        console.log("AURA: onTabCreated event");
         var currentTab = component.get("v.consoleTabId");
         var newTabId = event.getParam('tabId');
-        var workspaceAPI = component.find("workspace"); 
         
         if (newTabId == currentTab) {
             component.set('v.tabFocused', true);
@@ -30,9 +31,9 @@
     },        
  
     onTabFocused : function(component, event, helper) {
+	    console.log("AURA: onTabFocused event");
         var currentTab = component.get("v.consoleTabId");
         var focusedTabId = event.getParam('currentTabId');
-        var workspaceAPI = component.find("workspace"); 
         
         if (focusedTabId == currentTab) {
             component.set('v.tabFocused', true);
@@ -44,7 +45,7 @@
     }, 
     
     onTabUpdated : function(component, event, helper) {
-        var workspaceAPI = component.find("workspace");
+        console.log("AURA: onTabUpdated event");
         var focusedTabId = event.getParam("tabId");
         var currentTab = component.get("v.consoleTabId");
         
@@ -58,9 +59,9 @@
     },
     
     onTabReplaced : function(component, event, helper) {
+        console.log("AURA: onTabReplaced event");
         var currentTab = component.get("v.consoleTabId");
         var replacedTabId = event.getParam('tabId');
-        var workspaceAPI = component.find("workspace");
         
         if (replacedTabId == currentTab) {
             component.set('v.tabFocused', true);
@@ -72,6 +73,7 @@
     },
     
     onTabClosed : function(component, event, helper) {
+        console.log("AURA: onTabClosed event");
         var currentTab = component.get("v.consoleTabId");
         var tabId = event.getParam('tabId');
         

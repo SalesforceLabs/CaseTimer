@@ -1,21 +1,28 @@
 global with sharing class CaseTimeCount {
     
     @AuraEnabled
-    global static Session_Time__c[] newSession(Id caseId, String timeVal) {
+    global static String checkAccess() {
+        String accessMessage = null;
+        
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
-        String[] fieldsToCheck = new String[] {'CaseTimer19__Case__c', 'CaseTimer19__Date__c','CaseTimer19__Duration__c','CaseTimer19__Agent__c'};
+        String[] fieldsToCheck = new String[] {'Case__c', 'Date__c','Duration__c','Agent__c'};
             for(String field : fieldsToCheck) {
                 if(!objMap.get(field).getDescribe().isAccessible() && !objMap.get(field).getDescribe().isCreateable() ) {
-                    throw new System.NoAccessException();
+                    accessMessage = 'Unable to access Session Time object field ' + field;
+                    break;
                 }
             } 
-        if (!Schema.sObjectType.Case.fields.Id.isAccessible()){
-            throw new System.NoAccessException();
+        if (accessMessage != null && !Schema.sObjectType.Case.fields.Id.isAccessible()){
+			accessMessage = 'Unable to access Case ID field.';
         }
-        if (!Schema.sObjectType.User.fields.Name.isAccessible()){
-            throw new System.NoAccessException();
+        if (accessMessage != null && !Schema.sObjectType.User.fields.Name.isAccessible()){
+			accessMessage = 'Unable to access Current User name.';
         }
-        
+        return accessMessage;
+    }
+    
+    @AuraEnabled
+    global static Session_Time__c[] newSession(Id caseId, String timeVal) {
         // Time Calculations 
         String[] t = timeVal.split(':');
         Integer h = Integer.valueof(t[0]);
@@ -23,7 +30,7 @@ global with sharing class CaseTimeCount {
         Integer s = Integer.valueof(t[2]);
         Integer fullTime = s + (m * 60) + (h * 3600);                
         
-        List<Session_Time__c> sessionTimes1 = [SELECT LastModifiedDate, CaseTimer19__Agent__r.Name, CaseTimer19__Date__c, CreatedById, CaseTimer19__Duration__c FROM CaseTimer19__Session_Time__c WHERE CaseTimer19__Case__r.Id = :caseId ORDER BY LastModifiedDate DESC Limit 1]; 
+        List<Session_Time__c> sessionTimes1 = [SELECT LastModifiedDate, Agent__r.Name, Date__c, CreatedById, Duration__c FROM Session_Time__c WHERE Case__r.Id = :caseId ORDER BY LastModifiedDate DESC Limit 1]; 
         
         Session_Time__c latestSessionTime = new Session_Time__c();
         latestSessionTime.Case__c = caseId;
@@ -35,10 +42,10 @@ global with sharing class CaseTimeCount {
             latestSessionTime = sessionTimes1[0];
         }
         
-        CaseTimer19__Buffer_Duration__mdt caseTimeCustomSetting = [Select CaseTimer19__Duration_Buffer__c from CaseTimer19__Buffer_Duration__mdt where label='default' limit 1];
+        Buffer_Duration__mdt caseTimeCustomSetting = [Select Duration_Buffer__c from Buffer_Duration__mdt where label='default' limit 1];
         Decimal bufferDuration = caseTimeCustomSetting.Duration_Buffer__c;                       
         
-        if(latestSessionTime.CaseTimer19__Date__c == System.Date.today() && latestSessionTime.CaseTimer19__Duration__c == fullTime && latestSessionTime.CreatedbyId == UserINFO.getUserId() && (math.abs(latestSessionTime.LastModifiedDate.getTime() - DateTime.now().getTime()) <= (bufferDuration * 1000))) {
+        if(latestSessionTime.Date__c == System.Date.today() && latestSessionTime.Duration__c == fullTime && latestSessionTime.CreatedbyId == UserINFO.getUserId() && (math.abs(latestSessionTime.LastModifiedDate.getTime() - DateTime.now().getTime()) <= (bufferDuration * 1000))) {
         
         }
         else if(fullTime > bufferDuration){
@@ -58,7 +65,7 @@ global with sharing class CaseTimeCount {
     @AuraEnabled
     global static Session_Time__c[] newSessionManual(Id caseId, String timeVal, String theDate) {        
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
-        String[] fieldsToCheck = new String[] {'CaseTimer19__Case__c', 'CaseTimer19__Date__c','CaseTimer19__Duration__c','CaseTimer19__Agent__c','CaseTimer19__Manual_Entry__c'};
+        String[] fieldsToCheck = new String[] {'Case__c', 'Date__c','Duration__c','Agent__c','Manual_Entry__c'};
             for(String field : fieldsToCheck) {
                 if( !objMap.get(field).getDescribe().isAccessible() && !objMap.get(field).getDescribe().isCreateable() ) {
                     throw new System.NoAccessException();
@@ -92,7 +99,7 @@ global with sharing class CaseTimeCount {
     @AuraEnabled(cacheable=true)
     global static Session_Time__c[] grabSessions(Id recordId) {
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
-        String[] fieldsToCheck = new String[] {'CaseTimer19__Case__c', 'CaseTimer19__Date__c','CaseTimer19__Duration__c','CaseTimer19__Agent__c'};
+        String[] fieldsToCheck = new String[] {'Case__c', 'Date__c','Duration__c','Agent__c'};
             for(String field : fieldsToCheck) {
                 if( !objMap.get(field).getDescribe().isAccessible() && !objMap.get(field).getDescribe().isCreateable() ) {
                     throw new System.NoAccessException();

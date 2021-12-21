@@ -143,7 +143,6 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
-    <deprecated>false</deprecated>
     <description>Keep track of every session and the time associated with it.</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
@@ -154,149 +153,15 @@
     <enableSearch>true</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <fields>
-        <fullName>Agent__c</fullName>
-        <deleteConstraint>SetNull</deleteConstraint>
-        <deprecated>false</deprecated>
-        <description>Lookup Field to the Agent</description>
-        <externalId>false</externalId>
-        <label>Agent</label>
-        <referenceTo>User</referenceTo>
-        <relationshipName>Session_Times</relationshipName>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Lookup</type>
-    </fields>
-    <fields>
-        <fullName>Case__c</fullName>
-        <deprecated>false</deprecated>
-        <description>Master-Detail to find case to track time on</description>
-        <externalId>false</externalId>
-        <label>Case</label>
-        <referenceTo>Case</referenceTo>
-        <relationshipLabel>Session Times</relationshipLabel>
-        <relationshipName>Session_Times</relationshipName>
-        <relationshipOrder>0</relationshipOrder>
-        <reparentableMasterDetail>false</reparentableMasterDetail>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>MasterDetail</type>
-        <writeRequiresMasterRead>false</writeRequiresMasterRead>
-    </fields>
-    <fields>
-        <fullName>Comments__c</fullName>
-        <deprecated>false</deprecated>
-        <externalId>false</externalId>
-        <label>Comments</label>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>TextArea</type>
-    </fields>
-    <fields>
-        <fullName>Date__c</fullName>
-        <deprecated>false</deprecated>
-        <externalId>false</externalId>
-        <label>Date</label>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Date</type>
-    </fields>
-    <fields>
-        <fullName>Duration__c</fullName>
-        <deprecated>false</deprecated>
-        <externalId>false</externalId>
-        <label>Duration</label>
-        <precision>18</precision>
-        <required>false</required>
-        <scale>0</scale>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Number</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>Manual_Entry__c</fullName>
-        <defaultValue>false</defaultValue>
-        <deprecated>false</deprecated>
-        <externalId>false</externalId>
-        <label>Manual Entry</label>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Checkbox</type>
-    </fields>
-    <fields>
-        <fullName>Session_Time__c</fullName>
-        <deprecated>false</deprecated>
-        <description>Retains each session Time</description>
-        <externalId>false</externalId>
-        <label>Session Time</label>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Time</type>
-    </fields>
-    <fields>
-        <fullName>Time__c</fullName>
-        <deprecated>false</deprecated>
-        <description>Time of case</description>
-        <externalId>false</externalId>
-        <label>Time</label>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>DateTime</type>
-    </fields>
-    <fields>
-        <fullName>Type__c</fullName>
-        <deprecated>false</deprecated>
-        <externalId>false</externalId>
-        <label>Type</label>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Picklist</type>
-        <valueSet>
-            <valueSetDefinition>
-                <sorted>false</sorted>
-                <value>
-                    <fullName>Automatic</fullName>
-                    <default>false</default>
-                    <label>Automatic</label>
-                </value>
-                <value>
-                    <fullName>Manual</fullName>
-                    <default>false</default>
-                    <label>Manual</label>
-                </value>
-            </valueSetDefinition>
-        </valueSet>
-    </fields>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
     <label>Session Time</label>
-    <listViews>
-        <fullName>All</fullName>
-        <columns>NAME</columns>
-        <columns>CREATEDBY_USER</columns>
-        <columns>Duration__c</columns>
-        <columns>Date__c</columns>
-        <columns>LAST_UPDATE</columns>
-        <filterScope>Everything</filterScope>
-        <label>All</label>
-    </listViews>
-    <listViews>
-        <fullName>All1</fullName>
-        <filterScope>Everything</filterScope>
-        <label>All</label>
-    </listViews>
     <nameField>
         <label>Session Time Name</label>
         <trackHistory>false</trackHistory>
         <type>Text</type>
     </nameField>
     <pluralLabel>Session Times</pluralLabel>
-    <searchLayouts/>
+    <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

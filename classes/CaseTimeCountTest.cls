@@ -12,25 +12,25 @@ global with sharing class CaseTimeCountTest {
     
     static testMethod void newSessionTest() {
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
-        List<Session_Time__c> sesh = CaseTimer19.CaseTimeCount.newSession(cId, '00:12:35');
+        List<Session_Time__c> sesh = CaseTimeCount.newSession(cId, '00:12:35');
         System.assert(!sesh.isEmpty());
     }
     
     static testMethod void newSessionManualTest() {
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
-        List<Session_Time__c> sesh = CaseTimer19.CaseTimeCount.newSessionManual(cId, '00:12:00', '2018-12-15');
+        List<Session_Time__c> sesh = CaseTimeCount.newSessionManual(cId, '00:12:00', '2018-12-15');
         System.assert(!sesh.isEmpty());
     }
     
     static testMethod void grabSessionsTest() {
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
-        List<Session_Time__c> sesh = CaseTimer19.CaseTimeCount.grabSessions(cId);
+        List<Session_Time__c> sesh = CaseTimeCount.grabSessions(cId);
         System.assert(!sesh.isEmpty());
     }
     
     static testMethod void totalTimeTest(){
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
-        Double totalTimeVal = CaseTimer19.CaseTimeCount.totalTime(cId);
+        Double totalTimeVal = CaseTimeCount.totalTime(cId);
         System.assert(totalTimeVal != null);        
     }
     

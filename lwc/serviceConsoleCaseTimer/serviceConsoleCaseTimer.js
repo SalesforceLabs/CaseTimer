@@ -12,6 +12,7 @@ import newSession from "@salesforce/apex/CaseTimeCount.newSession";
 import totalTime from "@salesforce/apex/CaseTimeCount.totalTime";
 import grabSessions from "@salesforce/apex/CaseTimeCount.grabSessions";
 import newSessionManual from "@salesforce/apex/CaseTimeCount.newSessionManual";
+import checkAccess from "@salesforce/apex/CaseTimeCount.checkAccess";
 
 export default class ServiceConsoleCaseTimer extends LightningElement {
 
@@ -47,14 +48,17 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     totalMilliseconds = 0;
     @track ispaused;
     @track tabisclosed;
+    @track hasAccess = true;
+    @track accessMessage;
 
 
     @wire(grabSessions, {recordId: '$recordId'}) sessions;    
     @wire(getRecord, { recordId: '$recordId'}) caseRecord;       
     
-    @wire(totalTime, {recordId: '$recordId'})
-    wireTotalTime(result) {
+    // Go get the total time from the database
+    @wire(totalTime, {recordId: '$recordId'}) wireTotalTime(result) {
         this.total = result;
+        console.log("LWC - totalTime: " + result);
         if (result.data){
             this.formattedTime = this.formatSeconds(result.data);
             this.error = undefined;
@@ -63,6 +67,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             this.formattedTime = '00:00:00';
         }
     }
+        
 
     @api
     get paused() {
@@ -70,6 +75,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     }
 
     set paused(value) {
+        console.log("LWC - tabPaused: " + value);
         this._paused = value;
         this.ispaused = this._paused;
         this.pauseTimer(this.ispaused);
@@ -81,6 +87,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     }
 
     set tabclosed(value){
+        console.log("LWC - tabClosed: " + value);
         this._tabclosed = value;
         this.tabisclosed = this._tabclosed;
         if(this.tabisclosed){
@@ -102,17 +109,27 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         if(this.autoStart){              
             this.start();
         }
+        checkAccess().then(result => {
+            this.accessMessage = result;
+            if (result) {
+                this.hasAccess = false;
+                this.hideClock = true;
+            }
+        })
         window.addEventListener("beforeunload", this.disconnectedHandler); 
     }       
     
     // Function for detecting window navigation/closing 
     disconnectedHandler(){
+
+        console.log("LWC - disconnectingHandler. stime: " + this.stime);
         if(this.stime !== '00:00:00'){       
-        this.stop();        
-        newSession({caseId: this.recordId, timeVal: this.stime}).then(() => {
-            })
-            .catch(error => {
-            });
+            this.stop();        
+            newSession({caseId: this.recordId, timeVal: this.stime}).then(() => {
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
     }
 
@@ -120,9 +137,9 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         switch(ontab){
             // False means play timer
             case false:  
-            if(this.stime != '00:00:00' && this.playing != true){
-                this.start();
-            }                              
+                if(this.stime != '00:00:00' && this.playing != true){
+                    this.start();
+                }                              
                 break;
             // True means pause timer
             case true:                            

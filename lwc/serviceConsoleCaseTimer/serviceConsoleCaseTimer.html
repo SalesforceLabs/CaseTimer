@@ -6,7 +6,7 @@
         </h1>
         <lightning-button slot="actions" if:true={allowManual} label="New" onclick={toggleModal} disabled={disabled} ></lightning-button>    
         <div class="slds-card">
-            <center if:false={hideClock}>
+            <div class="center" if:false={hideClock}>
                 <ul class="buttonAndTimer">
                     <li>
                         <template if:true={playing}>
@@ -23,8 +23,12 @@
                         </div>
                     </li>
                 </ul>
-            </center>   
-            <div class="tableCont slds-scrollable--y">
+            </div>
+            <div class="center" if:false={hasAccess}>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Access required" slot="title">Access Required</h1>
+                <p class="slds-text-body_small mediumWeight slds-line-height_reset">{accessMessage}</p>
+            </div>
+            <div class="tableCont slds-scrollable--y" if:true={hasAccess}>
                 <table class="slds-table slds-table--bordered slds-table--fixed-layout fullWidth">
                     <thead>
                         <tr class="slds-text-title--caps">

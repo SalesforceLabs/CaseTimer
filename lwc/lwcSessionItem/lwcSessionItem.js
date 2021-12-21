@@ -15,12 +15,12 @@ export default class LwcSessionItem extends NavigationMixin(LightningElement) {
     set session(value){     
         if(value){
             this._session = value;        
-            this.formattedTime = this.formatTime(value.CaseTimer19__Duration__c);                        
+            this.formattedTime = this.formatTime(value.Duration__c);                        
         }           
     }
 
     connectedCallback(){
-        this.generateAgentURL(this.session.CaseTimer19__Agent__c);
+        this.generateAgentURL(this.session.Agent__c);
         this.generateSessionURL(this.session.Id);
     }
 
@@ -42,7 +42,7 @@ export default class LwcSessionItem extends NavigationMixin(LightningElement) {
             type: 'standard__recordPage',
             attributes: {
                 recordId: sessionId,
-                objectApiName: 'CaseTimer19__Session_Time__c',
+                objectApiName: 'Session_Time__c',
                 actionName: 'view'
             },
         }).then(url => {

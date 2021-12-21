@@ -3,6 +3,10 @@
     height: 100%;
 }
 
+.center {
+    text-align: center;
+}
+
 .numCol {
     width: 2.75rem;
 }
