@@ -1,4 +1,8 @@
+.sfdx/*
+.sfdx/indexes/*
+.sfdx/indexes/*
 .sfdx/orgs/cpaterson@lwctimer.dev/metadata/metadataTypes.json
+.sfdx/orgs/cpaterson@lwctimer.dev/metadata/AuraDefinitionBundle.json
 .sfdx/tools/apex.db
 .sfdx/tools/sobjects/standardObjects/Account.cls
 .sfdx/tools/sobjects/standardObjects/Attachment.cls
