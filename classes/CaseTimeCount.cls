@@ -63,7 +63,7 @@ global with sharing class CaseTimeCount {
     }
     
     @AuraEnabled
-    global static Session_Time__c[] newSessionManual(Id caseId, String timeVal, String theDate) {        
+    global static Session_Time__c[] newSessionManual(Id caseId, String timeVal, String theDate, String comments) {        
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
         String[] fieldsToCheck = new String[] {'Case__c', 'Date__c','Duration__c','Agent__c','Manual_Entry__c'};
             for(String field : fieldsToCheck) {
@@ -91,6 +91,7 @@ global with sharing class CaseTimeCount {
         session.Session_Time__c = Time.newInstance(h, m, s, 0);
         session.Agent__c = UserINFO.getUserId();
         session.Manual_Entry__c  = true;
+        session.Comments__c = comments;
         
         insert session;
         return [SELECT Agent__r.Name, Date__c, Duration__c, Session_Time__c FROM Session_Time__c WHERE Case__r.Id = :caseId ORDER BY CreatedDate DESC];

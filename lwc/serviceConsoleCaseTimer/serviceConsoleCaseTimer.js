@@ -36,6 +36,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @track modalClass = 'slds-hide';
     @track manualDate;
     @track manualDuration = '00:00:00';
+    @track comments;
 
     //Timer Variables
     @track stime = "00:00:00";
@@ -181,6 +182,9 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         else if( event.target.name == 'manualDuration' ){
             this.manualDuration = event.target.value;
         }
+        else if( event.target.name == 'comments' ){
+            this.comments = event.target.value;
+        }
     }
 
     //Method to automatically start session
@@ -211,7 +215,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
 
     //Manually Saving Session - onClick method
     handleSaveSession(){
-        newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate)})
+        newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate), comments: this.comments})
             .then(() => {
                 this.dispatchEvent(
                     new ShowToastEvent({
