@@ -4,6 +4,7 @@
     <design:attribute name="hideClockVar" label="Hide Component Clock?" default="false"/>
     <design:attribute name="allowManualVar" label="Allow Manual Logging?" default="false"/>
     <design:attribute name="autoStartVar" label="Start timer automatically" default="false"/>
+    <design:attribute name="pauseOnLostFocus" label="Pause when browser losses focus" default="false"/>
     <sfdc:objects>
         <sfdc:object>Case</sfdc:object>
     </sfdc:objects>

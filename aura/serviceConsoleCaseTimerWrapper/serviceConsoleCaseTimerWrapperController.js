@@ -14,6 +14,11 @@
             component.set('v.consoleTabId', enclosingTabId);
             component.set('v.tabFocused', true);
         })
+        
+        workspaceAPI.isConsoleNavigation().then(function(response) {
+            // Set the parameter - true if console nav, false if standard
+            component.set("v.isConsoleNavigation", response);
+        })
     },
     
     onTabCreated : function(component, event, helper) {
@@ -108,5 +113,8 @@
                 navEvt.fire();
             }
         })
-    }
+    },
+    handleDestroy : function(component, event, helper) {
+		console.log("AURA: destroy event");
+	}
 })

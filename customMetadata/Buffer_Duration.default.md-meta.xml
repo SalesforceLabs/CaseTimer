@@ -4,6 +4,6 @@
     <protected>false</protected>
     <values>
         <field>Duration_Buffer__c</field>
-        <value xsi:type="xsd:double">0.0</value>
+        <value xsi:type="xsd:double">5.0</value>
     </values>
 </CustomMetadata>
