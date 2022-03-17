@@ -1,38 +1,61 @@
-<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <!-- Used for debugging, should be false for deployment -->
+    <aura:attribute name="loggingEnabled" type="Boolean" default="false"/>
+    
+	<!-- Event Handlers to track navigation within the Console -->
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="lightning:tabCreated" action="{!c.onTabUpdated}"/>
+    <aura:handler event="lightning:tabFocused" action="{!c.onTabFocused}"/>
+    <aura:handler event="lightning:tabUpdated" action="{!c.onTabUpdated}"/>
+    <aura:handler event="lightning:tabReplaced" action="{!c.onTabUpdated}"/>
+    <aura:handler event="lightning:tabClosed" action="{!c.onTabClosed}"/>
     
     <!-- console navigation variables -->
     <aura:attribute name="consoleTabId" type="String"/>
-    <aura:attribute name="tabFocused" type="Boolean"/>
+    <aura:attribute name="isConsoleNavigation" type="Boolean" default="false" access="global"/>
     
-    <!-- serviceConsoleCaseTimer lwc design attributes -->
+    <!-- serviceConsoleCaseTimer design attributes - set in App Builder -->
     <aura:attribute name="hideCmpVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="cmpHeaderVar" type="String" default="Session Timer" access="global"/>   
     <aura:attribute name="hideClockVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="allowManualVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="autoStartVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="pausedVar" type="Boolean"/>
+    <aura:attribute name="stopWhenCaseClosedVar" type="Boolean"/>
     <aura:attribute name="maintabClosed" type="Boolean" default="false"/>
-    <aura:attribute name="isConsoleNavigation" type="Boolean" default="false" access="global"/>
 	<aura:attribute name="pauseOnLostFocus" type="Boolean" default="false" access="global"/>
     
-    <lightning:workspaceAPI aura:id="workspace" />
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-    <aura:handler event="lightning:tabCreated" action="{! c.onTabCreated }"/>
-    <aura:handler event="lightning:tabFocused" action="{! c.onTabFocused }"/>
-    <aura:handler event="lightning:tabUpdated" action="{! c.onTabUpdated }"/>
-    <aura:handler event="lightning:tabReplaced" action="{! c.onTabReplaced }"/>
-    <aura:handler event="lightning:tabClosed" action="{! c.onTabClosed }"/>
-    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
+    <!-- Record variables to track updates/changes to the current record -->
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="caseStatus" type="String"/>
+    <aura:attribute name="caseIsClosed" type="Boolean"/>
+
+    <force:recordData aura:id="recordLoader"
+      fields="Status,IsClosed,Cumulative_Time__c"
+      recordId="{!v.recordId}"
+      targetFields="{!v.simpleRecord}"
+      targetError="{!v.recordError}"
+      recordUpdated="{!c.handleRecordUpdated}"
+      />
     
-    <c:serviceConsoleCaseTimer onpassingagentid="{!c.parentreceivedid}"
-                               recordId="{!v.recordId}"
-                               hideCmp="{!v.hideCmpVar}"
-                               cmpHeader="{!v.cmpHeaderVar}"
-                               hideClock="{!v.hideClockVar}"
-                               allowManual="{!v.allowManualVar}"
-                               autoStart="{!v.autoStartVar}"
-                               paused="{!v.pausedVar}" 
-                               tabclosed="{!v.maintabClosed}"
-                               isConsoleNavigation="{!v.isConsoleNavigation}"
-                               pauseOnLostFocus="{!v.pauseOnLostFocus}" />
+    <!-- Load the LWC that handles most of the logic. The variables passed may be 
+		 updated by this component, and trigger actions in the LWC --> 
+    <c:serviceConsoleCaseTimer 
+        recordId="{!v.recordId}"
+        hideCmp="{!v.hideCmpVar}"
+        cmpHeader="{!v.cmpHeaderVar}"
+        hideClock="{!v.hideClockVar}"
+        allowManual="{!v.allowManualVar}"
+        autoStart="{!v.autoStartVar}"
+        paused="{!v.pausedVar}" 
+        tabclosed="{!v.maintabClosed}"
+        isConsoleNavigation="{!v.isConsoleNavigation}"
+        pauseOnLostFocus="{!v.pauseOnLostFocus}"
+        caseStatus="{!v.caseStatus}"
+        caseIsClosed="{!v.caseIsClosed}"
+        stopWhenCaseClosed="{!v.stopWhenCaseClosedVar}"
+    />
 </aura:component>

@@ -47,6 +47,7 @@
 
 .buttonAndTimer li img{
     vertical-align: middle;
+    cursor: pointer;
 }
 
 .buttonAndTimer li input{

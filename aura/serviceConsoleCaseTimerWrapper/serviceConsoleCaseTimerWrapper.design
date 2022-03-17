@@ -1,10 +1,12 @@
 <design:component label="Case Timer">
     <design:attribute name="cmpHeaderVar" label="Component Header"/>   
-    <design:attribute name="hideCmpVar" label="Hide Component?" default="false"/>
-    <design:attribute name="hideClockVar" label="Hide Component Clock?" default="false"/>
-    <design:attribute name="allowManualVar" label="Allow Manual Logging?" default="false"/>
-    <design:attribute name="autoStartVar" label="Start timer automatically" default="false"/>
-    <design:attribute name="pauseOnLostFocus" label="Pause when browser losses focus" default="false"/>
+    <design:attribute name="hideCmpVar" label="Hide Component?" default="false" description="When checked, the component will be hidden from view"/>
+    <design:attribute name="hideClockVar" label="Hide Component Clock?" default="false" description="When checked, the timer clock will be hidden on the component"/>
+    <design:attribute name="allowManualVar" label="Allow Manual Logging?" default="false" description="When checked, the button to manually log time will be available"/>
+    <design:attribute name="autoStartVar" label="Start timer automatically" default="false" description="When checked, the timer will automatically start when the page is loaded"/>
+    <design:attribute name="stopWhenCaseClosedVar" label="Don't log time when case is closed" default="false" description="When checked, no time will be counted when the case is in a closed status"/>
+    <design:attribute name="pauseOnLostFocus" label="Pause when browser loses focus" default="false" description="When checked, the timer will be paused when the browser window is not in focus. Note: Time will still be paused if the screen this component is on is not visible within the Salesforce console even if this is checked"/>
+    
     <sfdc:objects>
         <sfdc:object>Case</sfdc:object>
     </sfdc:objects>

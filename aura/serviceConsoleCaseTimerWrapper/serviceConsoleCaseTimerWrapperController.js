@@ -1,5 +1,7 @@
 ({
-    doInit : function(component, event, helper) {                
+    doInit : function(component, event, helper) {        
+		component.set('v.loggingEnabled',true); // Determines if the logs are written to the console. Disabled/remove before publishing
+        
         var autoStarted = component.get("v.autoStartVar");
         var workspaceAPI = component.find("workspace");
         
@@ -10,9 +12,8 @@
         }
         workspaceAPI.getEnclosingTabId().then(function(response){
             var enclosingTabId = response;
-            console.log("TabID: " + enclosingTabId);
+            helper.logToConsole(component, "TabID: " + enclosingTabId);
             component.set('v.consoleTabId', enclosingTabId);
-            component.set('v.tabFocused', true);
         })
         
         workspaceAPI.isConsoleNavigation().then(function(response) {
@@ -20,101 +21,39 @@
             component.set("v.isConsoleNavigation", response);
         })
     },
-    
-    onTabCreated : function(component, event, helper) {
-        console.log("AURA: onTabCreated event");
-        var currentTab = component.get("v.consoleTabId");
-        var newTabId = event.getParam('tabId');
-        
-        if (newTabId == currentTab) {
-            component.set('v.tabFocused', true);
-            component.set('v.pausedVar', false);
-        }else {
-            component.set('v.tabFocused', false);
-            component.set('v.pausedVar', true);
-        } 
-    },        
- 
-    onTabFocused : function(component, event, helper) {
-	    console.log("AURA: onTabFocused event");
-        var currentTab = component.get("v.consoleTabId");
-        var focusedTabId = event.getParam('currentTabId');
-        
-        if (focusedTabId == currentTab) {
-            component.set('v.tabFocused', true);
-            component.set('v.pausedVar', false);
-        }else {
-            component.set('v.tabFocused', false);
-            component.set('v.pausedVar', true);
-        } 
-    }, 
-    
-    onTabUpdated : function(component, event, helper) {
-        console.log("AURA: onTabUpdated event");
-        var focusedTabId = event.getParam("tabId");
-        var currentTab = component.get("v.consoleTabId");
-        
-        if (focusedTabId == currentTab) {
-            component.set('v.tabFocused', true);
-            component.set('v.pausedVar', false);
-        }else {
-            component.set('v.tabFocused', false);
-            component.set('v.pausedVar', true);
-        } 
-    },
-    
-    onTabReplaced : function(component, event, helper) {
-        console.log("AURA: onTabReplaced event");
-        var currentTab = component.get("v.consoleTabId");
-        var replacedTabId = event.getParam('tabId');
-        
-        if (replacedTabId == currentTab) {
-            component.set('v.tabFocused', true);
-            component.set('v.pausedVar', false);
-        } else {
-            component.set('v.tabFocused', false);
-            component.set('v.pausedVar', true);
-        } 
-    },
-    
-    onTabClosed : function(component, event, helper) {
-        console.log("AURA: onTabClosed event");
-        var currentTab = component.get("v.consoleTabId");
-        var tabId = event.getParam('tabId');
-        
-        if(tabId == currentTab){
-            component.set('v.maintabClosed', true);
-        } else{
-            component.set('v.maintabClosed', false);
+    // Called when the Case record is updated within the agents session
+    handleRecordUpdated: function(component, event, helper) {
+        var eventParams = event.getParams();
+        if(eventParams.changeType === "LOADED" || eventParams.changeType === "CHANGED") {
+           // record is loaded or updated in this session
+            helper.logToConsole(component, "Record Update event: " + eventParams.changeType);
+            helper.logToConsole(component, "Case in status " + component.get("v.simpleRecord.Status") + ", IsClosed: " + component.get("v.simpleRecord.IsClosed") + ", Time: " + component.get("v.simpleRecord.Cumulative_Time__c"));
+            helper.updateCaseStatus(component);
         }
     },
     
-    parentreceivedid : function(component, event, helper){        
-        var workspaceAPI = component.find("workspace");
-        var agentId = event.getParam('passedrecid');          
-        
-        workspaceAPI.isConsoleNavigation().then(function(response) {
-            if(response){
-                workspaceAPI.openTab({
-                    recordId: agentId,
-                }).then(function(response) {
-                    workspaceAPI.getTabInfo({
-                        tabId: response
-                    }).then(function(tabInfo) {
-                    });
-                })
-                .catch(function(error) {
-                });
-            }else{
-                var navEvt = $A.get("e.force:navigateToSObject");
-                navEvt.setParams({
-                    "recordId": agentId,
-                });
-                navEvt.fire();
-            }
-        })
+    onTabCreated : function(component, event, helper) {
+        helper.logToConsole(component, "onTabCreated event");
+        helper.updateVisibility(component, event.getParam('tabId'));
+    },        
+    
+    onTabFocused : function(component, event, helper) {
+        helper.logToConsole(component, "onTabFocused event");
+        helper.updateVisibility(component, event.getParam('currentTabId'));
+    }, 
+    
+    onTabUpdated : function(component, event, helper) {
+        helper.logToConsole(component, "onTabUpdated event");
+        helper.updateVisibility(component, event.getParam('tabId'));
     },
-    handleDestroy : function(component, event, helper) {
-		console.log("AURA: destroy event");
-	}
+    
+    onTabReplaced : function(component, event, helper) {
+        helper.logToConsole(component, "onTabReplaced event");
+        helper.updateVisibility(component, event.getParam('tabId'));
+    },
+    
+    onTabClosed : function(component, event, helper) {
+        helper.logToConsole(component, "onTabClosed event");
+        helper.tabClosed(component, event.getParam('tabId'));
+    }
 })

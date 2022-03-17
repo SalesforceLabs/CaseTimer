@@ -3,11 +3,6 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import timerPause from '@salesforce/resourceUrl/timerpause';
 import timerPlay from '@salesforce/resourceUrl/timerplay';
 import { refreshApex } from '@salesforce/apex';
-
-//import stopWatchClass from './stopwatch';
-
-//import SESSION_OBJECT from "@salesforce/schema/Session_Time__c";
-import { getRecord } from 'lightning/uiRecordApi';
 import newSession from "@salesforce/apex/CaseTimeCount.newSession";
 import totalTime from "@salesforce/apex/CaseTimeCount.totalTime";
 import grabSessions from "@salesforce/apex/CaseTimeCount.grabSessions";
@@ -16,14 +11,16 @@ import checkAccess from "@salesforce/apex/CaseTimeCount.checkAccess";
 
 export default class ServiceConsoleCaseTimer extends LightningElement {
 
+    // Whether to log out to the browser console or not. Disabled before publishing
+    loggingEnabled = true;
+
     //Static Resources
     timerPauseBtn = timerPause;
     timerPlayBtn = timerPlay;
-    
+
     //Fields and IDs
-    @api recordId; 
-    @track caseId;    
-    
+    @api recordId;
+
     //Design Attributes
     @api hideCmp = false;
     @api cmpHeader;
@@ -32,7 +29,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @api autoStart = false;
     @api isConsoleNavigation = false;
     @api pauseOnLostFocus = false;
-   // @api pauseOnHidden = false;
+    @api stopWhenCaseClosed = false;
 
     //Modal
     @track modalClosed = true;
@@ -58,14 +55,13 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @track accessMessage;
     @track observer;
 
-
+    // Gets the list of sessions related to this record
     @wire(grabSessions, {recordId: '$recordId'}) sessions;    
-    @wire(getRecord, { recordId: '$recordId'}) caseRecord;       
     
     // Go get the total time from the database
     @wire(totalTime, {recordId: '$recordId'}) wireTotalTime(result) {
         this.total = result;
-        console.log("LWC - totalTime: " + result.data);
+        this.logToConsole("totalTime: " + result.data);
         if (result.data){
             this.formattedTime = this.formatSeconds(result.data);
             this.error = undefined;
@@ -74,25 +70,70 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             this.formattedTime = '00:00:00';
         }
     }
-        
+    
+
     @api
     get paused() {
         return this._paused;
     }
-
+    // Called when value in the Aura component is updated
     set paused(value) {
-        console.log("LWC - tabPaused: " + value);
+        this.logToConsole("tabPaused: " + value);
         this._paused = value;
         this.pauseTimer(this._paused);
     }
 
     @api
+    get caseStatus() {
+        return this._caseStatus;
+    }
+
+    // Called when value in the Aura component is updated
+    set caseStatus(value) {
+        this.logToConsole("caseStatus: " + value);
+        // Before updating the status create a new time entry and use the previous status value
+        if (this._caseStatus && this._caseStatus != value)
+        {
+            this.logToConsole("CaseStatus: changed");
+            this.stop();
+            this.logToConsole("Saving new session " + this.totalMilliseconds);
+            newSession({caseId: this.recordId, timeVal: this.totalMilliseconds, status: this.caseStatus}).then(() => {
+                    // Reload the values from the DB so we have the latest
+                    refreshApex(this.sessions);
+                    refreshApex(this.total);  
+                    this.totalMilliseconds = 0;
+                    this.manualPause ? this.updateTime() : this.start(); // Only restart the timer if we haven't manually paused before the update of the status
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            
+        }
+        this._caseStatus = value;
+    }
+
+    @api
+    get caseIsClosed() {
+        return this._IsClosed;
+    }
+
+    // Called when value in the Aura component is updated
+    set caseIsClosed(value) {
+        this.logToConsole("IsClosed: " + value);
+        if (value === true && this.stopWhenCaseClosed)
+        {
+            this.stop();
+        }
+        this._IsClosed = value;
+    }
+    @api
     get tabclosed(){
         return this._tabclosed;
     }
 
+    // Called when value in the Aura component is updated
     set tabclosed(value){
-        console.log("LWC - tabClosed: " + value);
+        this.logToConsole("tabClosed: " + value);
         this._tabclosed = value;
         this.tabisclosed = this._tabclosed;
         if(this.tabisclosed){
@@ -107,12 +148,12 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         this.pauseTimer = this.pauseTimer.bind(this);
         this.onvisibilitychange = this.onvisibilitychange.bind(this);
         this.btnClick = this.btnClick.bind(this);
-     }
+    }
 
     connectedCallback() {
-        console.log("location.href: " + location.href);
+        this.logToConsole("location.href: " + location.href);
         this.isRunningInAppBuilder = location.href.indexOf("flexipageEditor") > 0;
-        console.log("isRunningInAppBuilder: " + this.isRunningInAppBuilder);
+        this.logToConsole("isRunningInAppBuilder: " + this.isRunningInAppBuilder);
 
         this.manualPause = !this.autoStart; // Set manual pause true if we aren't auto-starting
         if(this.autoStart){              
@@ -129,31 +170,32 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         // For console navigation the tab stays open and the Workspace API allows us to track updates
         if (!this.isConsoleNavigation && !this.isRunningInAppBuilder) {
             // For standard navigation we need to listen for the URL changing and write the time at that point
+            // Never got this reliably working, so for now, only Console apps are supported
             // let lastUrl = location.href;
-            console.log("lastUrl: " + lastUrl);
-            new MutationObserver((mutationsList, observer) => {
-                const url = location.href;
-                console.log("lastUrl: " + lastUrl);
-                console.log("url: " + url);
-                if (url !== lastUrl) {
-                    this.disconnectedHandler();
-                }
-                 // Use traditional 'for loops' for IE 11
-                for(const mutation of mutationsList) {
-                    if (mutation.type === 'childList') {
-                        console.log('A child node has been added or removed.');
-                    }
-                    else if (mutation.type === 'attributes') {
-                        console.log('The ' + mutation.attributeName + ' attribute was modified.');
-                    }
-                }
-                observer.disconnect();
-            }).observe(document, {subtree: true,childList: true});
+            // this.logToConsole("lastUrl: " + lastUrl);
+            // new MutationObserver((mutationsList, observer) => {
+            //     const url = location.href;
+            //     this.logToConsole("lastUrl: " + lastUrl);
+            //     this.logToConsole("url: " + url);
+            //     if (url !== lastUrl) {
+            //         this.disconnectedHandler();
+            //     }
+            //      // Use traditional 'for loops' for IE 11
+            //     for(const mutation of mutationsList) {
+            //         if (mutation.type === 'childList') {
+            //             this.logToConsole('A child node has been added or removed.');
+            //         }
+            //         else if (mutation.type === 'attributes') {
+            //             this.logToConsole('The ' + mutation.attributeName + ' attribute was modified.');
+            //         }
+            //     }
+            //     observer.disconnect();
+            // }).observe(document, {subtree: true,childList: true});
         }
 
         window.addEventListener("beforeunload", this.disconnectedHandler);
         
-        console.log("pauseOnLostFocus: " + this.pauseOnLostFocus);
+        this.logToConsole("pauseOnLostFocus: " + this.pauseOnLostFocus);
         if (this.pauseOnLostFocus) {
             // this one detects changing tabs in the browser
             document.addEventListener("visibilitychange", this.onvisibilitychange);
@@ -165,18 +207,20 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     
     disconnectedCallback() {
         //this.observer.disconnect();
-        console.log("LWC - disconnectedCallback() called");
+        this.logToConsole("disconnectedCallback() called");
         this.disconnectedHandler();
     }
 
     // Function for detecting window navigation/closing 
     disconnectedHandler(){
-        console.log("LWC - disconnectingHandler. stime: " + this.stime);
+        this.logToConsole("disconnectingHandler. stime: " + this.stime + ", this.timeSaved: " + this.timeSaved) ;
         if(!this.timeSaved && this.stime !== '00:00:00'){       
             this.stop();
-            this.timeSaved = true; // Ensures we only save once
-            newSession({caseId: this.recordId, timeVal: this.totalMilliseconds}).then(() => {
-                 
+            this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
+            this.logToConsole("Saving new session " + this.totalMilliseconds);
+            newSession({caseId: this.recordId, timeVal: this.totalMilliseconds, status: this.caseStatus}).then(() => {
+                    refreshApex(this.sessions);
+                    refreshApex(this.total);  
                 })
                 .catch(error => {
                     console.error(error);
@@ -191,18 +235,18 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     }
 
     onvisibilitychange (evt) {
-        console.log("Visiblity Event - " + evt.type);
-        console.log("document.visibilityState: " + document.visibilityState);
-        console.log("playing: " + this.playing + ", manualPause: " + this.manualPause);
+        this.logToConsole("Visiblity Event - " + evt.type);
+        this.logToConsole("document.visibilityState: " + document.visibilityState);
+        this.logToConsole("playing: " + this.playing + ", manualPause: " + this.manualPause);
         
         // Browser events for the window being hidden or shown
         if (!this.manualPause && ((evt.type === 'visibilitychange' && document.visibilityState === 'visible') ||
                 evt.type === 'focus' )) {
-            console.log("Starting/continuing");
+            this.logToConsole("Starting/continuing");
             this.start();
         } else if ((evt.type === 'visibilitychange' && document.visibilityState === 'hidden') ||
                 evt.type === 'blur' ) {
-            console.log("Pausing");
+            this.logToConsole("Pausing");
             this.stop();
         }
 
@@ -265,7 +309,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
 
     //Manually Saving Session - onClick method
     handleSaveSession(){
-        newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate), comments: this.comments})
+        newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate), comments: this.comments, status: this.caseStatus})
             .then(() => {
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -313,11 +357,11 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
 
     /////////////////HELPER METHODS//////////////////
     start(){
-        if (!this.isRunningInAppBuilder && !this.playing) {
+        if (!this.isRunningInAppBuilder && !this.playing && !(this.stopWhenCaseClosed && this.caseIsClosed)) {
             let that = this;
             this.playing = true;
             this.clocktimer = setInterval(function(){
-                that.updateStatus();
+                that.updateTime();
                 that.totalMilliseconds += 100;
             }, 100); 
         }
@@ -331,7 +375,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         }
     }
 
-    updateStatus(){      
+    updateTime(){      
         this.stime = this.formatMilliseconds(this.totalMilliseconds);  
     }    
 
@@ -340,7 +384,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         var h, m, s = 0;
         
         h = Math.floor( milliseconds / (60 * 60 * 1000) );
-        milliseconds = milliseconds % (60 * 60 * 1000);
+        milliseconds = milliseconds % (60 * 60 * 1000) ;
         m = Math.floor( milliseconds / (60 * 1000) );
         milliseconds = milliseconds % (60 * 1000);
         s = Math.floor( milliseconds / 1000 );
@@ -364,6 +408,12 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     pad(num, size){
         var s = "0000" + num;
         return s.substr(s.length - size);
+    }
+
+    logToConsole(textToLog) {
+        if (this.loggingEnabled) {
+            console.log("Case Timer LWC: " + textToLog);
+        }
     }
     //////////////////////////////////////////////////
 }
