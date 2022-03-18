@@ -47,7 +47,7 @@
                     <tbody>
                         <template if:true={sessions.data}>
                             <template for:each={sessions.data} for:item="session">
-                                <c-lwc-session-item key={session.id} session={session} onsendagentid={handleAgentId}></c-lwc-session-item>                            
+                                <c-lwc-session-item key={session.id} session={session} onsendrecordid={handleRecordId}></c-lwc-session-item>                            
                             </template>   
                         </template>                                          
                     </tbody>

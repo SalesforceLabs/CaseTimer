@@ -2,9 +2,7 @@ import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 
 export default class LwcSessionItem extends NavigationMixin(LightningElement) {
-    @track formattedTime;    
-    @track agentURL;
-    @track sessionURL;     
+    @track formattedTime;
     _session; 
 
     @api 
@@ -20,43 +18,15 @@ export default class LwcSessionItem extends NavigationMixin(LightningElement) {
     }
 
     connectedCallback(){
-        this.generateAgentURL(this.session.Agent__c);
-        this.generateSessionURL(this.session.Id);
     }
 
-    generateAgentURL(agentId){
-        this[NavigationMixin.GenerateUrl]({
-            type: 'standard__recordPage',
-            attributes: {
-                recordId: agentId,
-                objectApiName: 'User',
-                actionName: 'view',
-            },
-        }).then(url => {
-            this.agentURL = url;
-        });
-    }
-
-    generateSessionURL(sessionId){
-        this[NavigationMixin.GenerateUrl]({
-            type: 'standard__recordPage',
-            attributes: {
-                recordId: sessionId,
-                objectApiName: 'Session_Time__c',
-                actionName: 'view'
-            },
-        }).then(url => {
-            this.sessionURL = url;
-        });
-    }
-
-    handleClickedAgent(event){
+    handleClickedRecord(event){
         var recId = event.target.dataset.targetId;
 
-        const sendAgentIdEvent = new CustomEvent('sendagentid',{
+        const sendRecordIdEvent = new CustomEvent('sendrecordid',{
             detail : recId,
         })
-        this.dispatchEvent(sendAgentIdEvent);
+        this.dispatchEvent(sendRecordIdEvent);
         
     }
     

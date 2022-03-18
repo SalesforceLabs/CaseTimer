@@ -272,14 +272,14 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         }
     }
 
-    //Send Agent Id to Aura Component Wrapper
-    handleAgentId(event){
+    //Send Record Id to Aura Component Wrapper to open the record (either session record or agent/user)
+    handleRecordId(event){
         var passedrecid = event.detail;
 
-        const passingAgentIdEvent = new CustomEvent('passingagentid',{
+        const passingRecordIdEvent = new CustomEvent('passingrecordid',{
             detail : {passedrecid},
         })
-        this.dispatchEvent(passingAgentIdEvent);
+        this.dispatchEvent(passingRecordIdEvent);
     }
 
     //Open Modal Logic
