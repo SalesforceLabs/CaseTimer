@@ -25,6 +25,7 @@
     <aura:attribute name="stopWhenCaseClosedVar" type="Boolean"/>
     <aura:attribute name="maintabClosed" type="Boolean" default="false"/>
 	<aura:attribute name="pauseOnLostFocus" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="bufferInSecondsVar" type="Integer" default="0" access="global"/>
     
     <!-- Record variables to track updates/changes to the current record -->
     <aura:attribute name="record" type="Object"/>
@@ -44,7 +45,8 @@
     <!-- Load the LWC that handles most of the logic. The variables passed may be 
 		 updated by this component, and trigger actions in the LWC --> 
     <c:serviceConsoleCaseTimer 
-        recordId="{!v.recordId}"
+        onpassingrecordid="{!c.openRecord}"
+		recordId="{!v.recordId}"
         hideCmp="{!v.hideCmpVar}"
         cmpHeader="{!v.cmpHeaderVar}"
         hideClock="{!v.hideClockVar}"
@@ -57,5 +59,6 @@
         caseStatus="{!v.caseStatus}"
         caseIsClosed="{!v.caseIsClosed}"
         stopWhenCaseClosed="{!v.stopWhenCaseClosedVar}"
+        bufferInSeconds="{!v.bufferInSecondsVar}"
     />
 </aura:component>

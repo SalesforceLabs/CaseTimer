@@ -12,7 +12,7 @@ import checkAccess from "@salesforce/apex/CaseTimeCount.checkAccess";
 export default class ServiceConsoleCaseTimer extends LightningElement {
 
     // Whether to log out to the browser console or not. Disabled before publishing
-    loggingEnabled = true;
+    loggingEnabled = false;
 
     //Static Resources
     timerPauseBtn = timerPause;
@@ -30,6 +30,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @api isConsoleNavigation = false;
     @api pauseOnLostFocus = false;
     @api stopWhenCaseClosed = false;
+    @api bufferInSeconds = 0;
 
     //Modal
     @track modalClosed = true;
@@ -169,6 +170,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         
         // For console navigation the tab stays open and the Workspace API allows us to track updates
         if (!this.isConsoleNavigation && !this.isRunningInAppBuilder) {
+            // NEVER GOT THIS RELIABLY WORKING SO ONLY SUPPORTING CONSOLE SCREENS
             // For standard navigation we need to listen for the URL changing and write the time at that point
             // Never got this reliably working, so for now, only Console apps are supported
             // let lastUrl = location.href;
@@ -214,7 +216,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     // Function for detecting window navigation/closing 
     disconnectedHandler(){
         this.logToConsole("disconnectingHandler. stime: " + this.stime + ", this.timeSaved: " + this.timeSaved) ;
-        if(!this.timeSaved && this.stime !== '00:00:00'){       
+        if(!this.timeSaved && this.stime !== '00:00:00' && this.totalMilliseconds > (this.bufferInSeconds*1000)){       
             this.stop();
             this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
             this.logToConsole("Saving new session " + this.totalMilliseconds);
