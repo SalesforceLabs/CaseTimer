@@ -1,14 +1,6 @@
 {
   "packageDirectories": [
-    { "path": "aura" },
-    { "path": "classes" },
-    { "path": "flexipages"  },
-    { "path": "layouts"  },
-    { "path": "lwc" },
-    { "path": "objects" },
-    { "path": "permissionsets" },
-    { "path": "staticresources" },
-    { "path": "tabs" }
+    { "path": "force-app" }
   ],
   "name": "CaseTimer",
   "namespace": "",
