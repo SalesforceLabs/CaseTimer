@@ -12,7 +12,7 @@ global with sharing class CaseTimeCountTest {
     
     static testMethod void checkAccessTest() {
         String message = CaseTimeCount.checkAccess();
-        System.assert(message == null, 'Error checking access.');
+        System.assert(message == null, 'Error checking access - message: ' + message);
     }
     
     static testMethod void newSessionTest() {
@@ -36,7 +36,7 @@ global with sharing class CaseTimeCountTest {
     static testMethod void totalTimeTest(){
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
         Double totalTimeVal = CaseTimeCount.totalTime(cId);
-        System.assert(totalTimeVal != null);        
+        System.assert(totalTimeVal == (1200 + 1988), 'Incorrect time returned - got: ' + totalTimeVal + ', expected: 3188');        
     }
     
 }

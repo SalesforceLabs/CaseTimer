@@ -1,6 +1,6 @@
 ({
     doInit : function(component, event, helper) {        
-		component.set('v.loggingEnabled',true); // Determines if the logs are written to the console. Disable/remove before publishing
+		//component.set('v.loggingEnabled',true); // Determines if the logs are written to the console. Disable/remove before publishing
         
         var autoStarted = component.get("v.autoStartVar");
         var workspaceAPI = component.find("workspace");

@@ -32,7 +32,7 @@ global with sharing class CaseTimeCount {
     global static Session_Time__c newSession(Id caseId, Integer timeVal, String status) {
         // Time Calculations - convert milliseconds to seconds.   
         Integer timeInSecs = timeVal/1000;               
-        return CaseTimeCount.saveSession(caseId, timeInSecs, System.Date.today(), null, status, true);        
+        return CaseTimeCount.saveSession(caseId, timeInSecs, System.Date.today(), null, status, false);        
     }
     
     @AuraEnabled
@@ -51,7 +51,7 @@ global with sharing class CaseTimeCount {
     global static Session_Time__c saveSession(Id caseId, Integer duration, Date theDate, String comments, String status, Boolean isManual)
     {   
 		Session_Time__c session = new Session_Time__c();
-        session.Case__c = caseId;
+        session.Case__c  = caseId;
         session.Date__c = theDate;
         session.Duration__c = duration;
         session.Agent__c = UserINFO.getUserId();
@@ -72,8 +72,8 @@ global with sharing class CaseTimeCount {
     @AuraEnabled(cacheable=true)
     // Gets the total time spent on the record
     global static Double totalTime(Id recordId) {        
-        Double total = [SELECT Id, Cumulative_Time__c FROM Case WHERE Id = :recordId LIMIT 1].Cumulative_Time__c;
-        return total;
+        AggregateResult aggr = [SELECT SUM(Duration__c) TotalDuration FROM Session_Time__c WHERE Case__r.Id = :recordId][0];
+        return (Double)aggr.get('TotalDuration');
     }
     
 }

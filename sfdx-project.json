@@ -2,7 +2,6 @@
   "packageDirectories": [
     { "path": "aura" },
     { "path": "classes" },
-    { "path": "customMetadata" },
     { "path": "flexipages"  },
     { "path": "layouts"  },
     { "path": "lwc" },
