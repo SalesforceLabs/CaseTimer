@@ -1,6 +1,6 @@
 ({
     doInit : function(component, event, helper) {        
-		component.set('v.loggingEnabled',true); // Determines if the logs are written to the console. Disable/remove before publishing
+		//component.set('v.loggingEnabled',true); // Determines if the logs are written to the console. Disable/remove before publishing
         
         var autoStarted = component.get("v.autoStartVar");
         var workspaceAPI = component.find("workspace");
@@ -14,21 +14,26 @@
             var enclosingTabId = response;
             helper.logToConsole(component, "TabID: " + enclosingTabId);
             component.set('v.consoleTabId', enclosingTabId);
-        })
+        });
         
         workspaceAPI.isConsoleNavigation().then(function(response) {
             // Set the parameter - true if console nav, false if standard
             component.set("v.isConsoleNavigation", response);
-        })
+        });
+        
     },
     // Called when the Case record is updated within the agents session
     handleRecordUpdated: function(component, event, helper) {
         var eventParams = event.getParams();
+        helper.logToConsole(component, "Record Update event: " + eventParams.changeType);
         if(eventParams.changeType === "LOADED" || eventParams.changeType === "CHANGED") {
            // record is loaded or updated in this session
-            helper.logToConsole(component, "Record Update event: " + eventParams.changeType);
-            helper.logToConsole(component, "Case in status " + component.get("v.simpleRecord.Status") + ", IsClosed: " + component.get("v.simpleRecord.IsClosed") + ", Time: " + component.get("v.simpleRecord.Cumulative_Time__c"));
+            helper.logToConsole(component, "Case in status " + component.get("v.simpleRecord.Status") + ", IsClosed: " + component.get("v.simpleRecord.IsClosed"));
             helper.updateCaseStatus(component);
+        } 
+        else if(eventParams.changeType === "ERROR") {
+            // there’s an error while loading, saving, or deleting the record
+            helper.logToConsole(component, "event: " + event); //JSON.stringify(event));
         }
     },
     

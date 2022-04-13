@@ -35,7 +35,7 @@
     <aura:attribute name="caseIsClosed" type="Boolean"/>
 
     <force:recordData aura:id="recordLoader"
-      fields="Status,IsClosed,Cumulative_Time__c"
+      fields="Status,IsClosed"
       recordId="{!v.recordId}"
       targetFields="{!v.simpleRecord}"
       targetError="{!v.recordError}"

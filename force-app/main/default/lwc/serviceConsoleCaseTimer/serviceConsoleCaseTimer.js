@@ -69,6 +69,10 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         } else if (result.error) {
             this.error = result.error;
             this.formattedTime = '00:00:00';
+        } else 
+        {
+            // if the result is NULL (i.e. no time recorded)
+            this.formattedTime = '00:00:00';
         }
     }
     
@@ -161,11 +165,19 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             this.start();
         }
         checkAccess().then(result => {
+            this.logToConsole('checkAccess(): Got result returned');
             this.accessMessage = result;
             if (result) {
                 this.hasAccess = false;
                 this.hideClock = true;
+                this.hideCmp = false;
             }
+        }).catch(error => {
+            this.logToConsole('Error in call to checkAccess() - usually due to no access to the Apex Class. Assign the permission set');
+            this.accessMessage = error.body.message;
+            this.hasAccess = false;
+            this.hideClock = true;
+            this.hideCmp = false; // For show this component
         })
         
         // For console navigation the tab stays open and the Workspace API allows us to track updates
