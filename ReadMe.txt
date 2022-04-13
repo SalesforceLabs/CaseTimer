@@ -5,9 +5,8 @@ Setup steps for this repository
 1. Connect Visual Studio Code to this repository
 2. Connect Visual Studio Code to a Salesforce Org, preferably a new DEV org
 3. Deploy all of this code to the Salesforce Org
-4. Add a 'default' Buffer Duration via the 'Custom Metadata Types' admin screen
-5. Add the Case Timer component to the Case page layout
-6. Assign the 'Case Timer User' permission set to your user
+4. Add the Case Timer component to the Case page layout
+5. Assign the 'Case Timer User' permission set to your user
 
 
 /*
