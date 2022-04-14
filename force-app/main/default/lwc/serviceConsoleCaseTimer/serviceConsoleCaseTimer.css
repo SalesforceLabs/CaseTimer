@@ -1,0 +1,58 @@
+.tableCont {
+    max-height: 200px;
+    height: 100%;
+}
+
+.center {
+    text-align: center;
+}
+
+.numCol {
+    width: 2.75rem;
+}
+
+.fullWidth {
+    width: 100%;    
+}
+
+.headPad {
+    padding: .3rem 0;
+}
+
+.mediumWeight {
+    font-weight:400;
+}
+
+.timerClass {
+    display: inline-block;
+    line-height: 1.875rem;
+    min-height: calc(1.875rem + (1px * 2));
+    width:50%;
+    font-size: 30px;
+    margin:3%;
+    border: none !important;
+    text-align:center;
+}
+
+.buttonAndTimer {
+    font-size: 0.8em;
+    padding: 18px 0;
+}
+
+.buttonAndTimer li{
+    list-style-type: none;
+    margin:0;
+    line-height: 0px;
+}
+
+.buttonAndTimer li img{
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.buttonAndTimer li input{
+    font-size:30px;
+    padding-left: 10%;
+    display: inline-block;
+    vertical-align: middle;
+}

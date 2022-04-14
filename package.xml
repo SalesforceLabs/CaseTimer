@@ -2,7 +2,6 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Case Timer</fullName>
     <apiAccessLevel>Unrestricted</apiAccessLevel>
-    <namespacePrefix>CaseTimer19</namespacePrefix>
     <types>
         <members>CaseTimeCount</members>
         <members>CaseTimeCountTest</members>
@@ -13,9 +12,6 @@
         <name>AuraDefinitionBundle</name>
     </types>
     <types>
-        <members>Buffer_Duration__mdt.Duration_Buffer__c</members>
-        <members>Case.Cumulative_Time__c</members>
-        <members>CaseTimer__c.Duration_Buffer__c</members>
         <members>Session_Time__c.Agent__c</members>
         <members>Session_Time__c.Case__c</members>
         <members>Session_Time__c.Comments__c</members>
@@ -23,18 +19,9 @@
         <members>Session_Time__c.Duration__c</members>
         <members>Session_Time__c.Manual_Entry__c</members>
         <members>Session_Time__c.Session_Time__c</members>
-        <members>Session_Time__c.Time__c</members>
-        <members>Session_Time__c.Type__c</members>
         <name>CustomField</name>
     </types>
     <types>
-        <members>Buffer_Duration.Default</members>
-        <name>CustomMetadata</name>
-    </types>
-    <types>
-        <members>Buffer_Duration_Default__mdt</members>
-        <members>Buffer_Duration__mdt</members>
-        <members>CaseTimer__c</members>
         <members>Session_Time__c</members>
         <name>CustomObject</name>
     </types>
@@ -43,8 +30,6 @@
         <name>CustomTab</name>
     </types>
     <types>
-        <members>Buffer_Duration_Default__mdt-Buffer Duration Default Layout</members>
-        <members>Buffer_Duration__mdt-Buffer Duration Layout</members>
         <members>Session_Time__c-Session Time Layout</members>
         <name>Layout</name>
     </types>
@@ -55,7 +40,6 @@
     </types>
     <types>
         <members>Session_Time__c.All</members>
-        <members>Session_Time__c.All1</members>
         <name>ListView</name>
     </types>
     <types>

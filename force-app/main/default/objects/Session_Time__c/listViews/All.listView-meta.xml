@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>Case__c</columns>
+    <columns>Agent__c</columns>
+    <columns>Date__c</columns>
+    <columns>Case_Status__c</columns>
+    <columns>Duration__c</columns>
+    <columns>Manual_Entry__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Session Times</label>
+</ListView>
