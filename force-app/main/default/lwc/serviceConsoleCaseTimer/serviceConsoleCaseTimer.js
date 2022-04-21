@@ -246,6 +246,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     errorCallback(error, stack)
     {
         console.error(error.message);
+        console.error(stack);
     }
 
     onvisibilitychange (evt) {
