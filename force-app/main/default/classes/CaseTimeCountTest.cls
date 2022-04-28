@@ -8,6 +8,8 @@ global with sharing class CaseTimeCountTest {
         insert s;
         Session_Time__c s2 = new Session_Time__c (Case__c = c.Id, Date__c = System.Date.today(), Duration__c = 1988, Agent__c = UserInfo.getUserId());
         insert s2;
+        c = new Case(Subject = 'Test Case 2');
+        insert c;
     }
     
     static testMethod void checkAccessTest() {
@@ -36,7 +38,10 @@ global with sharing class CaseTimeCountTest {
     static testMethod void totalTimeTest(){
         Id cId = [SELECT Id FROM Case WHERE Subject='Test Case'].Id;
         Double totalTimeVal = CaseTimeCount.totalTime(cId);
-        System.assert(totalTimeVal == (1200 + 1988), 'Incorrect time returned - got: ' + totalTimeVal + ', expected: 3188');        
+        System.assert(totalTimeVal == (1200 + 1988), 'Incorrect time returned - got: ' + totalTimeVal + ', expected: 3188'); 
+        cId = [SELECT Id FROM Case WHERE Subject='Test Case 2'].Id;
+        totalTimeVal = CaseTimeCount.totalTime(cId);
+        System.assert(totalTimeVal == 0, 'Incorrect time returned - got: ' + totalTimeVal + ', expected: 0'); 
     }
     
 }

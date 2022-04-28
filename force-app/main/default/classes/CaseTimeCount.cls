@@ -1,5 +1,7 @@
 global with sharing class CaseTimeCount {
     
+    // Required for Managed packages to have a Namespace for custom fields/objects
+    static String namespace = 'LWCCaseTimer__';
     @AuraEnabled
     // Checks all the required pre-config has been completed. 
     global static String checkAccess() {
@@ -7,7 +9,7 @@ global with sharing class CaseTimeCount {
         
         // Check we can access the custom object
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
-        String[] fieldsToCheck = new String[] {'Case__c', 'Date__c','Duration__c','Agent__c','Case_Status__c'};
+        String[] fieldsToCheck = new String[] {namespace +'Case__c', namespace + 'Date__c', namespace + 'Duration__c', namespace + 'Agent__c', namespace + 'Case_Status__c'};
         for(String field : fieldsToCheck) {
             if(!objMap.get(field).getDescribe().isAccessible() && !objMap.get(field).getDescribe().isCreateable() ) {
                 accessMessage = 'Unable to access Session Time object field ' + field;
@@ -66,14 +68,14 @@ global with sharing class CaseTimeCount {
     @AuraEnabled(cacheable=true)
     // Get all the sessions related to this record
     global static Session_Time__c[] grabSessions(Id recordId) {
-        return [SELECT Agent__r.Name, Date__c, Duration__c FROM Session_Time__c WHERE Case__r.Id = :recordId ORDER BY CreatedDate DESC];
+        return [SELECT Id, Agent__r.Name , Agent__c, Date__c, Duration__c FROM Session_Time__c WHERE Case__r.Id = :recordId ORDER BY CreatedDate DESC];
     }
     
     @AuraEnabled(cacheable=true)
     // Gets the total time spent on the record
     global static Double totalTime(Id recordId) {        
         AggregateResult aggr = [SELECT SUM(Duration__c) TotalDuration FROM Session_Time__c WHERE Case__r.Id = :recordId][0];
-        return (Double)aggr.get('TotalDuration');
+        return aggr.get('TotalDuration') != null ? (Double)aggr.get('TotalDuration') : 0;
     }
     
 }
