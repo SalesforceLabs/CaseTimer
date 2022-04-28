@@ -13,7 +13,7 @@ export default class LwcSessionItem extends NavigationMixin(LightningElement) {
     set session(value){     
         if(value){
             this._session = value;        
-            this.formattedTime = this.formatTime(value.Duration__c);                        
+            this.formattedTime = this.formatTime(value.LWCCaseTimer__Duration__c);                        
         }           
     }
 

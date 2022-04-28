@@ -246,6 +246,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     errorCallback(error, stack)
     {
         console.error(error.message);
+        console.error(stack);
     }
 
     onvisibilitychange (evt) {
@@ -305,7 +306,8 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     //clear manual session creation form inputs
     clearInputs(){
         this.manualDate = null;
-        this.manualDuration = '00:00:00';       
+        this.manualDuration = '00:00:00';
+        this.comments = null;
     }
 
     //handle manual session creation form input
