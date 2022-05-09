@@ -9,7 +9,7 @@ global with sharing class CaseTimeCount {
         
         // Check we can access the custom object
         Map<String,Schema.SObjectField> objMap = Schema.SObjectType.Session_Time__c.fields.getMap();
-        String[] fieldsToCheck = new String[] {namespace +'Case__c', namespace + 'Date__c', namespace + 'Duration__c', namespace + 'Agent__c', namespace + 'Case_Status__c'};
+        String[] fieldsToCheck = new String[] {'Name',  namespace +'Case__c', namespace + 'Date__c', namespace + 'Duration__c', namespace + 'Agent__c', namespace + 'Case_Status__c', namespace + 'Manual_Entry__c',namespace + 'Comments__c' };
         for(String field : fieldsToCheck) {
             if(!objMap.get(field).getDescribe().isAccessible() && !objMap.get(field).getDescribe().isCreateable() ) {
                 accessMessage = 'Unable to access Session Time object field ' + field;
@@ -22,7 +22,7 @@ global with sharing class CaseTimeCount {
 			accessMessage = 'Unable to access Case objects Id field.';
         }
         
-        if (accessMessage == null && !Schema.sObjectType.User.fields.Name.isAccessible()){
+        if (accessMessage == null && !Schema.sObjectType.User.fields.Name.isAccessible() && !Schema.sObjectType.User.fields.Id.isAccessible()){
 			accessMessage = 'Unable to access the User objects Name field.';
         }
         
@@ -68,13 +68,13 @@ global with sharing class CaseTimeCount {
     @AuraEnabled(cacheable=true)
     // Get all the sessions related to this record
     global static Session_Time__c[] grabSessions(Id recordId) {
-        return [SELECT Id, Agent__r.Name , Agent__c, Date__c, Duration__c FROM Session_Time__c WHERE Case__r.Id = :recordId ORDER BY CreatedDate DESC];
+        return [SELECT Id, Agent__r.Name , Agent__c, Date__c, Duration__c FROM Session_Time__c WHERE Case__c = :recordId ORDER BY CreatedDate DESC];
     }
     
     @AuraEnabled(cacheable=true)
     // Gets the total time spent on the record
     global static Double totalTime(Id recordId) {        
-        AggregateResult aggr = [SELECT SUM(Duration__c) TotalDuration FROM Session_Time__c WHERE Case__r.Id = :recordId][0];
+        AggregateResult aggr = [SELECT SUM(Duration__c) TotalDuration FROM Session_Time__c WHERE Case__c = :recordId][0];
         return aggr.get('TotalDuration') != null ? (Double)aggr.get('TotalDuration') : 0;
     }
     

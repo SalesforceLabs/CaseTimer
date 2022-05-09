@@ -20,7 +20,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>true</editable>
+        <editable>false</editable>
         <field>Session_Time__c.Comments__c</field>
         <readable>true</readable>
     </fieldPermissions>

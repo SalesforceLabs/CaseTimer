@@ -4,7 +4,7 @@
             {cmpHeader}
             <p class="slds-text-body_small mediumWeight slds-line-height_reset">Total: {formattedTime}</p>
         </h1>
-        <lightning-button slot="actions" if:true={allowManual} label="New" onclick={toggleModal} disabled={disabled} ></lightning-button>    
+        <lightning-button variant="brand" slot="actions" if:true={allowManual} label="New" onclick={toggleModal} disabled={disabled} ></lightning-button>    
         <div class="slds-card">
             <div class="center" if:false={hideClock}>
                 <ul class="buttonAndTimer">
@@ -69,7 +69,7 @@
                     </div>
                 </div>
                 <div class="slds-modal__footer">
-                    <lightning-button variant="brand" label="Cancel" title="Cancel" onclick={toggleModal} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button label="Cancel" title="Cancel" onclick={toggleModal} class="slds-m-left_x-small"></lightning-button>
                     <lightning-button variant="brand" label="Save" title="Save" onclick={handleSaveSession} class="slds-m-left_x-small"></lightning-button>
                 </div>
             </div>
