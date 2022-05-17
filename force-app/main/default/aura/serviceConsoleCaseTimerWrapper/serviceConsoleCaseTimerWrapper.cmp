@@ -21,8 +21,7 @@
     <aura:attribute name="hideClockVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="allowManualVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="autoStartVar" type="Boolean" default="true" access="global"/>
-    <aura:attribute name="pausedVar" type="Boolean"/>
-    <aura:attribute name="stopWhenCaseClosedVar" type="Boolean"/>
+    <aura:attribute name="stopWhenCaseClosedVar" type="Boolean" access="global"/>
     <aura:attribute name="maintabClosed" type="Boolean" default="false"/>
 	<aura:attribute name="pauseOnLostFocus" type="Boolean" default="false" access="global"/>
     <aura:attribute name="bufferInSecondsVar" type="Integer" default="5" access="global"/>
@@ -33,6 +32,7 @@
     <aura:attribute name="recordError" type="String"/>
     <aura:attribute name="caseStatus" type="String"/>
     <aura:attribute name="caseIsClosed" type="Boolean"/>
+    <aura:attribute name="pausedVar" type="Boolean"/>
 
     <force:recordData aura:id="recordLoader"
       fields="Status,IsClosed"
