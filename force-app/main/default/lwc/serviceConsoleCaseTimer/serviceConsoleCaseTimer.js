@@ -41,9 +41,12 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
 
     //Timer Variables
     @track stime = "00:00:00";
+    @track timerStartTime;
     @track formattedTime; 
     @track playing = false;
     @track manualPause = false;
+    @track pausedElapsedTime = 0;
+    @track pausedStartTime = 0;
     timeIntervalInstance;
     clocktimer;
     totalMilliseconds = 0;
@@ -57,7 +60,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @track observer;
 
     // Gets the list of sessions related to this record
-    @wire(grabSessions, {recordId: '$recordId'}) sessions;    
+    @wire(grabSessions, {recordId: '$recordId'}) sessions;
     
     // Go get the total time from the database
     @wire(totalTime, {recordId: '$recordId'}) wireTotalTime(result) {
@@ -107,6 +110,9 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
                     refreshApex(this.sessions);
                     refreshApex(this.total);  
                     this.totalMilliseconds = 0;
+                    this.pausedElapsedTime = 0;
+                    this.timerStartTime = Date.now();
+                    this.pausedStartTime = this.timerStartTime;
                     this.manualPause ? this.updateTime() : this.start(); // Only restart the timer if we haven't manually paused before the update of the status
                 })
                 .catch(error => {
@@ -159,9 +165,12 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         this.logToConsole("location.href: " + location.href);
         this.isRunningInAppBuilder = location.href.indexOf("flexipageEditor") > 0;
         this.logToConsole("isRunningInAppBuilder: " + this.isRunningInAppBuilder);
+        this.timerStartTime = Date.now();
+        this.pausedStartTime = this.timerStartTime;
+        this.logToConsole("timerStartTime: " + this.timerStartTime);
 
         this.manualPause = !this.autoStart; // Set manual pause true if we aren't auto-starting
-        if(this.autoStart){              
+        if(this.autoStart){
             this.start();
         }
         checkAccess().then(result => {
@@ -210,12 +219,10 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         window.addEventListener("beforeunload", this.disconnectedHandler);
         
         this.logToConsole("pauseOnLostFocus: " + this.pauseOnLostFocus);
-        if (this.pauseOnLostFocus) {
-            // this one detects changing tabs in the browser
-            document.addEventListener("visibilitychange", this.onvisibilitychange);
-            // Want these too for when leaving the browser window
-            window.onfocus = window.onblur = this.onvisibilitychange;
-        }
+        // this one detects changing tabs in the browser
+        document.addEventListener("visibilitychange", this.onvisibilitychange);
+        // Want these too for when leaving the browser window
+        window.onfocus = window.onblur = this.onvisibilitychange;
 
     }       
     
@@ -228,9 +235,9 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     // Function for detecting window navigation/closing 
     disconnectedHandler(){
         this.logToConsole("disconnectingHandler. stime: " + this.stime + ", this.timeSaved: " + this.timeSaved) ;
-        if(!this.timeSaved && this.stime !== '00:00:00' && this.totalMilliseconds > (this.bufferInSeconds*1000)){       
-            this.stop();
+        if(!this.timeSaved && this.stime !== '00:00:00' && this.totalMilliseconds > (this.bufferInSeconds*1000)){
             this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
+            this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
             newSession({caseId: this.recordId, timeVal: this.totalMilliseconds, status: this.caseStatus}).then(() => {
                     refreshApex(this.sessions);
@@ -257,14 +264,27 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         // Browser events for the window being hidden or shown
         if (!this.manualPause && ((evt.type === 'visibilitychange' && document.visibilityState === 'visible') ||
                 evt.type === 'focus' )) {
+            // focus on gaining focus for window and tab
+            // visibilitychange + visible on tab switch
             this.logToConsole("Starting/continuing");
             this.start();
+            if (evt.type === 'visibilitychange' && !this.pauseOnLostFocus)
+            {
+                // when changing tabs, the browser can pause timers in the background, so recalculate elasped time (if we pause on lost focus then we wont have been counting anyway)
+                this.logToConsole("this.timerStartTime + this.pausedElapsedTime: " + this.timerStartTime + " + " + this.pausedElapsedTime);
+                this.logToConsole("this.totalMilliseconds previous value.");
+                this.totalMilliseconds = Date.now() - (this.timerStartTime + this.pausedElapsedTime);
+                this.logToConsole("this.totalMilliseconds updated value.");
+            }
         } else if ((evt.type === 'visibilitychange' && document.visibilityState === 'hidden') ||
                 evt.type === 'blur' ) {
-            this.logToConsole("Pausing");
-            this.stop();
+            // blur on lose focus to different application/window
+            // visibilitychange on swapping browser tabs
+            if (this.pauseOnLostFocus) {
+                this.logToConsole("Pausing");
+                this.stop();
+            }
         }
-
     }
 
     // Called by the setting which is triggered via the Workspace API (from Aura component)
@@ -275,10 +295,10 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             case false:  
                 if(this.stime != '00:00:00' && !this.manualPause && !this.playing){
                     this.start();
-                }                              
+                }
                 break;
             // True means pause timer
-            case true:                            
+            case true:
                 this.stop();
                 break;
             default:
@@ -325,43 +345,57 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
 
     //Manually Saving Session - onClick method
     handleSaveSession(){
-        newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate), comments: this.comments, status: this.caseStatus})
-            .then(() => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Session Saved',
-                        message: 'New session created',
-                        variant: 'success',
-                    }),
-                );
-                // This goes and retrieves all of the data from the DB again, this could be more efficient
-                // By just adding the new one to the list and incrementing the count
-                refreshApex(this.sessions);
-                refreshApex(this.total);                        
-                this.toggleModal();
-                this.clearInputs();
-            })
-            .catch(error => {                
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error saving session',
-                        message: error.body.message,
-                        variant: 'error',
-                    }),
-                );
-            });
+        let isValid = true;
+        this.logToConsole("handleSaveSession() called");
+        let requiredInputs = this.template.querySelectorAll(".reqInpFld");
+        requiredInputs.forEach(inputField => {
+            if(!inputField.checkValidity()) {
+                inputField.reportValidity();
+                isValid = false;
+            }
+        });
+        if (isValid)
+        {
+            newSessionManual({caseId: this.recordId, timeVal: this.manualDuration, theDate: new Date(this.manualDate), comments: this.comments, status: this.caseStatus})
+                .then(result => {
+                    if (result) {
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Session Saved',
+                                message: 'New session created',
+                                variant: 'success',
+                            }),
+                        );
+                        // This goes and retrieves all of the data from the DB again, this could be more efficient
+                        // By just adding the new one to the list and incrementing the count
+                        refreshApex(this.sessions);
+                        refreshApex(this.total);
+                        this.toggleModal();
+                        this.clearInputs();
+                    }
+                })
+                .catch(error => {
+                    this.dispatchEvent(
+                        new ShowToastEvent({
+                            title: 'Error saving session',
+                            message: error.body.message,
+                            variant: 'error',
+                        }),
+                    );
+                });
+        }
     }
 
     //Pause Timer/Session when button clicked
     btnClick(event){
-        var id = event.target.dataset.id;       
+        var id = event.target.dataset.id;
         switch(id){
             case "start":
-                this.manualPause = false;              
+                this.manualPause = false;
                 this.start();
                 break;
             case "stop":
-                this.manualPause = true;              
+                this.manualPause = true;
                 this.stop();
                 break;
             default:
@@ -376,6 +410,10 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         if (!this.isRunningInAppBuilder && !this.playing && !(this.stopWhenCaseClosed && this.caseIsClosed)) {
             let that = this;
             this.playing = true;
+            // Keep track of how much time the timer has been paused
+            this.logToConsole("this.pausedStartTime: " + this.pausedStartTime);
+            this.pausedElapsedTime += (Date.now() - this.pausedStartTime);
+            this.logToConsole("pausedElapsedTime: " + this.pausedElapsedTime);
             this.clocktimer = setInterval(function(){
                 that.updateTime();
                 that.totalMilliseconds += 100;
@@ -386,13 +424,15 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     stop(){
         if (this.playing) 
         {
+            // Keep track of how much time the timer has been paused
+            this.pausedStartTime = Date.now();
             this.playing = false;
             clearInterval(this.clocktimer);
         }
     }
 
     updateTime(){      
-        this.stime = this.formatMilliseconds(this.totalMilliseconds);  
+        this.stime = this.formatMilliseconds(this.totalMilliseconds);
     }    
 
     //stopwatch stores values as milliseconds
