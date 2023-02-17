@@ -1,0 +1,79 @@
+<template>
+    <lightning-card if:false={hideCmp} icon-name='custom:custom25' id="cmpCard">
+        <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Session Timer" slot="title">
+            {cmpHeader}
+            <p class="slds-text-body_small mediumWeight slds-line-height_reset">Total: {formattedTime}</p>
+        </h1>
+        <lightning-button variant="brand" slot="actions" if:true={allowManual} label="New" onclick={toggleModal} disabled={disabled} ></lightning-button>    
+        <div class="slds-card">
+            <div class="center" if:false={hideClock}>
+                <ul class="buttonAndTimer">
+                    <li>
+                        <template if:true={playing}>
+                            <img data-id="stop" src={timerPauseBtn} onclick={btnClick} />
+                        </template>
+                        <template if:false={playing}>
+                            <img data-id="start" src={timerPlayBtn} onclick={btnClick} />
+                        </template>
+                        <template if:true={disconnected}>
+                            <img src={timerPauseBtn} />
+                        </template>
+                        <div id="time" class="timerClass">
+                            {stime}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="center" if:false={hasAccess}>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Access required" slot="title">Access Required</h1>
+                <p class="slds-text-body_small mediumWeight slds-line-height_reset">{accessMessage}<br /> <br />Please contact your administrator</p>
+            </div>
+            <div class="tableCont slds-scrollable--y" if:true={hasAccess}>
+                <table class="slds-table slds-table--bordered slds-table--fixed-layout fullWidth">
+                    <thead>
+                        <tr class="slds-text-title--caps">
+                            <th scope="col" class="numCol"></th>
+                            <th scope="col">
+                                <div class="slds-truncate headPad" title="Agent">Agent</div>
+                            </th>
+                            <th scope="col" class="">
+                                <div class="slds-truncate headPad" title="Date">Date</div>
+                            </th>
+                            <th scope="col" class="phone">
+                                <div class="slds-truncate headPad" title="Duration">Duration</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={sessions.data}>
+                            <template for:each={sessions.data} for:item="session">
+                                <c-lwc-session-item key={session.id} session={session} onsendrecordid={handleRecordId}></c-lwc-session-item>                            
+                            </template>   
+                        </template>                                          
+                    </tbody>
+                </table>
+            </div>     
+        </div>
+    </lightning-card>
+    <div data-id="myModal" class={modalClass}>
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h2 id="header43" class="slds-text-heading--medium">New Session</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <lightning-input required name='manualDate' data-id="manualDate" class="reqInpFld" type="date" label="Date" value={manualDate} onchange={handleFormInput}></lightning-input>
+                        <lightning-input required name='manualDuration' data-id="manualDuration" class="reqInpFld" type="string" label="Duration" value={manualDuration} pattern="(?!0+:00:00)([0-9]+:[0-5][0-9]:[0-5][0-9])" title="Time" placeholder="00:00:00" message-when-pattern-mismatch="Please enter a time longer than 0 seconds in HH:mm:ss format" onchange={handleFormInput}></lightning-input>
+                        <lightning-input required name='comments' data-id="comments" type="string" label="Comments" value={comments}  title="Comments" onchange={handleFormInput}></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-button label="Cancel" title="Cancel" onclick={toggleModal} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Save" title="Save" onclick={handleSaveSession} class="slds-m-left_x-small"></lightning-button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>
+</template>

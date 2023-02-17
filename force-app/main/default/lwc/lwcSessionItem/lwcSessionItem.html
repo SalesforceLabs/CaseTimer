@@ -1,0 +1,12 @@
+<template>
+    <td class="slds-row-number numCol rowClass"></td>
+    <td class="rowClass">
+        <div class="agentname slds-truncate" data-target-id={session.LWCCaseTimer__Agent__c} onclick={handleClickedRecord}> {session.LWCCaseTimer__Agent__r.Name} </div>
+        <!--lightning-button variant="base" label={session.CaseTimer19__Agent__r.Name} onclick={navigateToAgent}></lightning-button-->
+    </td>
+    <td class="rowClass">{session.LWCCaseTimer__Date__c}</td>
+    <td class="rowClass">
+        <div class="agentname slds-truncate" data-target-id={session.Id} onclick={handleClickedRecord}> {formattedTime}</div>
+        <!--lightning-button variant="base" label={formattedTime} onclick={navigateToSession}></lightning-button-->
+    </td>
+</template>

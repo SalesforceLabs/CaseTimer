@@ -1,0 +1,9 @@
+{
+  "packageDirectories": [
+    { "path": "force-app" }
+  ],
+  "name": "CaseTimer",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "52.0"
+}
