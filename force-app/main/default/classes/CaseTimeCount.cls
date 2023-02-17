@@ -33,7 +33,7 @@ global with sharing class CaseTimeCount {
     // Called when the tab is closed to record time against the record.
     global static Session_Time__c newSession(Id caseId, Integer timeVal, String status) {
         // Time Calculations - convert milliseconds to seconds.   
-        Integer timeInSecs = timeVal/1000;               
+        Integer timeInSecs = timeVal/1000;
         return CaseTimeCount.saveSession(caseId, timeInSecs, System.Date.today(), null, status, false);        
     }
     
@@ -52,17 +52,21 @@ global with sharing class CaseTimeCount {
     
     global static Session_Time__c saveSession(Id caseId, Integer duration, Date theDate, String comments, String status, Boolean isManual)
     {   
-		Session_Time__c session = new Session_Time__c();
-        session.Case__c  = caseId;
-        session.Date__c = theDate;
-        session.Duration__c = duration;
-        session.Agent__c = UserINFO.getUserId();
-        session.Manual_Entry__c  = isManual;
-        session.Comments__c = comments;
-        session.Name = UserINFO.getName() + ' time of ' + duration + 's on ' + String.valueOf(session.Date__c);
-        session.Case_Status__c = status;
-        insert session;
-        return session;
+        if (duration > 0)
+        { 
+            Session_Time__c session = new Session_Time__c();
+            session.Case__c  = caseId;
+            session.Date__c = theDate;
+            session.Duration__c = duration;
+            session.Agent__c = UserINFO.getUserId();
+            session.Manual_Entry__c  = isManual;
+            session.Comments__c = comments;
+            session.Name = UserINFO.getName() + ' time of ' + duration + 's on ' + String.valueOf(session.Date__c);
+            session.Case_Status__c = status;
+            insert session;
+            return session;
+        }
+        return null;
     }
     
     @AuraEnabled(cacheable=true)
