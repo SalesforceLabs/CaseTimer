@@ -53,6 +53,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @track tabisclosed;
     @track timeSaved = false;
     @track isRunningInAppBuilder = false;
+    tabHasFocus = true;
 
     // Field Access variables
     @track hasAccess = true;
@@ -221,8 +222,9 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         this.logToConsole("pauseOnLostFocus: " + this.pauseOnLostFocus);
         // this one detects changing tabs in the browser
         document.addEventListener("visibilitychange", this.onvisibilitychange);
-        // Want these too for when leaving the browser window
-        window.onfocus = window.onblur = this.onvisibilitychange;
+        // Want these too for when leaving the browser window for each case console tab opened.
+        window.addEventListener('blur', this.onvisibilitychange);
+        window.addEventListener('focus', this.onvisibilitychange);
 
     }       
     
@@ -239,6 +241,10 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
             this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
+            //Remove the window/dom event listeners once the component is removed from dom.
+            window.removeEventListener('blur', this.onvisibilitychange);
+            window.removeEventListener('focus', this.onvisibilitychange);
+            document.removeEventListener("visibilitychange", this.onvisibilitychange);
             newSession({caseId: this.recordId, timeVal: this.totalMilliseconds, status: this.caseStatus}).then(() => {
                     refreshApex(this.sessions);
                     refreshApex(this.total);  
@@ -261,8 +267,8 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         this.logToConsole("document.visibilityState: " + document.visibilityState);
         this.logToConsole("playing: " + this.playing + ", manualPause: " + this.manualPause);
         
-        // Browser events for the window being hidden or shown
-        if (!this.manualPause && ((evt.type === 'visibilitychange' && document.visibilityState === 'visible') ||
+        // Browser events for the window being hidden or shown. Only start if the component console tab has Focus
+        if (!this.manualPause && this.tabHasFocus && ((evt.type === 'visibilitychange' && document.visibilityState === 'visible') ||
                 evt.type === 'focus' )) {
             // focus on gaining focus for window and tab
             // visibilitychange + visible on tab switch
@@ -291,17 +297,20 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     // when tab switched within Salesforce
     pauseTimer(pause){
         switch(pause){
-            // False means play timer
-            case false:  
+            // False means play timer as tab has focus
+            case false:
+                this.tabHasFocus = true;
                 if(this.stime != '00:00:00' && !this.manualPause && !this.playing){
                     this.start();
                 }
                 break;
-            // True means pause timer
+            // True means pause timer as tab lost focus
             case true:
+                this.tabHasFocus = false;
                 this.stop();
                 break;
             default:
+                this.tabHasFocus = false;
                 this.stop();
                 break;
         }
