@@ -19,6 +19,7 @@
     <aura:attribute name="hideCmpVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="cmpHeaderVar" type="String" default="Session Timer" access="global"/>   
     <aura:attribute name="hideClockVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="hideListVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="allowManualVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="autoStartVar" type="Boolean" default="true" access="global"/>
     <aura:attribute name="stopWhenCaseClosedVar" type="Boolean" access="global"/>
@@ -50,6 +51,7 @@
         hideCmp="{!v.hideCmpVar}"
         cmpHeader="{!v.cmpHeaderVar}"
         hideClock="{!v.hideClockVar}"
+        hideList="{!v.hideListVar}"
         allowManual="{!v.allowManualVar}"
         autoStart="{!v.autoStartVar}"
         paused="{!v.pausedVar}" 
