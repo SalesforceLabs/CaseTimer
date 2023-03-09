@@ -25,6 +25,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @api hideCmp = false;
     @api cmpHeader;
     @api hideClock = false;
+    @api hideList = false;
     @api allowManual = false;
     @api autoStart = false;
     @api isConsoleNavigation = false;
@@ -180,6 +181,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             if (result) {
                 this.hasAccess = false;
                 this.hideClock = true;
+                this.hideList = true;
                 this.hideCmp = false;
             }
         }).catch(error => {
