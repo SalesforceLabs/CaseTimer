@@ -1,8 +1,8 @@
 <design:component label="Case Timer">
     <design:attribute name="cmpHeaderVar" label="Component Header"/>   
-    <design:attribute name="hideCmpVar" label="Hide Component?" default="false" description="When checked, the component will be hidden from view"/>
-    <design:attribute name="hideClockVar" label="Hide Component Clock?" default="false" description="When checked, the timer clock will be hidden on the component"/>
-    <design:attribute name="hideListVar" label="Hide Session Time List?" default="false" description="When checked, the list of session times will be hidden on the component"/>
+    <design:attribute name="hideCmpVar" label="Hide entire Component?" default="false" description="When checked, the component will be hidden from view"/>
+    <design:attribute name="hideClockVar" label="Hide just Component Clock?" default="false" description="When checked, the timer clock will be hidden on the component"/>
+    <design:attribute name="hideListVar" label="Hide just Session Time List?" default="false" description="When checked, the list of session times will be hidden on the component"/>
     <design:attribute name="bufferInSecondsVar" label="Buffer (in seconds)" default="5" description="Only record time against this record if the time is longer than this buffer. Note - it will still write time less than this if you update the case status."/>
     <design:attribute name="allowManualVar" label="Allow Manual Logging?" default="false" description="When checked, the button to manually log time will be available"/>
     <design:attribute name="autoStartVar" label="Start timer automatically" default="true" description="When checked, the timer will automatically start when the page is loaded"/>
