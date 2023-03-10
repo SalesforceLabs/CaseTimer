@@ -186,10 +186,11 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             }
         }).catch(error => {
             this.logToConsole('Error in call to checkAccess() - usually due to no access to the Apex Class. Assign the permission set');
-            this.accessMessage = error.body.message;
+            this.accessMessage = error.body.message + '. If this is the unmanaged version of the package, check the CaseTimeCount Apex class for help.';
             this.hasAccess = false;
             this.hideClock = true;
-            this.hideCmp = false; // For show this component
+            this.hideList = true;
+            this.hideCmp = false; // For showing this error messaging
         })
         
         // For console navigation the tab stays open and the Workspace API allows us to track updates
