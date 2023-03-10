@@ -155,7 +155,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     }
 
     constructor(params){
-        super(params)
+        super();
         // These are important to set the context of 'this' in the callback functions
         this.disconnectedHandler = this.disconnectedHandler.bind(this);
         this.pauseTimer = this.pauseTimer.bind(this);
