@@ -55,6 +55,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @track timeSaved = false;
     @track isRunningInAppBuilder = false;
     tabHasFocus = true;
+    timeSaveInProgress = false;
 
     // Field Access variables
     @track hasAccess = true;
@@ -107,6 +108,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             this.logToConsole("CaseStatus: changed");
             this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
+            this.timeSaveInProgress = true;
             newSession({caseId: this.recordId, timeVal: this.totalMilliseconds, status: this.caseStatus}).then(() => {
                     // Reload the values from the DB so we have the latest
                     refreshApex(this.sessions);
@@ -116,6 +118,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
                     this.timerStartTime = Date.now();
                     this.pausedStartTime = this.timerStartTime;
                     this.manualPause ? this.updateTime() : this.start(); // Only restart the timer if we haven't manually paused before the update of the status
+                    this.timeSaveInProgress = false;
                 })
                 .catch(error => {
                     console.error(error);
@@ -240,7 +243,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     // Function for detecting window navigation/closing 
     disconnectedHandler(){
         this.logToConsole("disconnectingHandler. stime: " + this.stime + ", this.timeSaved: " + this.timeSaved) ;
-        if(!this.timeSaved && this.stime !== '00:00:00' && this.totalMilliseconds > (this.bufferInSeconds*1000)){
+        if(!this.timeSaved && !this.timeSaveInProgress && this.stime !== '00:00:00' && this.totalMilliseconds > (this.bufferInSeconds*1000)){
             this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
             this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
