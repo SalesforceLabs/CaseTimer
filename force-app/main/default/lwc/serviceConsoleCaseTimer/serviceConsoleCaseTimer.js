@@ -104,6 +104,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         // Before updating the status create a new time entry and use the previous status value
         if (this._caseStatus && this._caseStatus != value)
         {
+            this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
             this.logToConsole("CaseStatus: changed");
             this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
@@ -116,9 +117,11 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
                     this.timerStartTime = Date.now();
                     this.pausedStartTime = this.timerStartTime;
                     this.manualPause ? this.updateTime() : this.start(); // Only restart the timer if we haven't manually paused before the update of the status
+                    this.timeSaved = false; // Ensures we only save once as this event can be called multiple times
                 })
                 .catch(error => {
                     console.error(error);
+                    this.timeSaved = false; // Ensures we only save once as this event can be called multiple times
                 });
             
         }
