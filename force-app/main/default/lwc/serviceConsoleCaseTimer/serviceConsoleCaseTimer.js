@@ -114,7 +114,6 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._caseStatus;
     }
 
-    // Called when value in the Aura component is updated
     set caseStatus(value) {
         this.logToConsole("caseStatus: " + value);
         // Before updating the status create a new time entry and use the previous status value
@@ -149,7 +148,6 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._IsClosed;
     }
 
-    // Called when value in the Aura component is updated
     set caseIsClosed(value) {
         this.logToConsole("IsClosed: " + value);
         if (value === true && this.stopWhenCaseClosed)
