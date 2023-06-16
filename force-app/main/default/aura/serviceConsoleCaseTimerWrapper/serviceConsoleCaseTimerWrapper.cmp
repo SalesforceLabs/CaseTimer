@@ -19,6 +19,7 @@
     <aura:attribute name="hideCmpVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="cmpHeaderVar" type="String" default="Session Timer" access="global"/>   
     <aura:attribute name="hideClockVar" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="hideListVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="allowManualVar" type="Boolean" default="false" access="global"/>
     <aura:attribute name="autoStartVar" type="Boolean" default="true" access="global"/>
     <aura:attribute name="stopWhenCaseClosedVar" type="Boolean" access="global"/>
@@ -27,21 +28,8 @@
     <aura:attribute name="bufferInSecondsVar" type="Integer" default="5" access="global"/>
     
     <!-- Record variables to track updates/changes to the current record -->
-    <aura:attribute name="record" type="Object"/>
-    <aura:attribute name="simpleRecord" type="Object"/>
-    <aura:attribute name="recordError" type="String"/>
-    <aura:attribute name="caseStatus" type="String"/>
-    <aura:attribute name="caseIsClosed" type="Boolean"/>
     <aura:attribute name="pausedVar" type="Boolean"/>
 
-    <force:recordData aura:id="recordLoader"
-      fields="Status,IsClosed"
-      recordId="{!v.recordId}"
-      targetFields="{!v.simpleRecord}"
-      targetError="{!v.recordError}"
-      recordUpdated="{!c.handleRecordUpdated}"
-      />
-    
     <!-- Load the LWC that handles most of the logic. The variables passed may be 
 		 updated by this component, and trigger actions in the LWC --> 
     <c:serviceConsoleCaseTimer 
@@ -50,14 +38,13 @@
         hideCmp="{!v.hideCmpVar}"
         cmpHeader="{!v.cmpHeaderVar}"
         hideClock="{!v.hideClockVar}"
+        hideList="{!v.hideListVar}"
         allowManual="{!v.allowManualVar}"
         autoStart="{!v.autoStartVar}"
         paused="{!v.pausedVar}" 
         tabclosed="{!v.maintabClosed}"
         isConsoleNavigation="{!v.isConsoleNavigation}"
         pauseOnLostFocus="{!v.pauseOnLostFocus}"
-        caseStatus="{!v.caseStatus}"
-        caseIsClosed="{!v.caseIsClosed}"
         stopWhenCaseClosed="{!v.stopWhenCaseClosedVar}"
         bufferInSeconds="{!v.bufferInSecondsVar}"
     />

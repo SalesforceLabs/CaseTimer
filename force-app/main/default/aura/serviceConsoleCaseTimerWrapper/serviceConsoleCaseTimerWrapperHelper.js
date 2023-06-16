@@ -18,12 +18,6 @@
             component.set('v.maintabClosed', false);
         }
     },
-    // Update the variables for the case status and open/closed values to trigger updates in the LWC component
-    updateCaseStatus : function(component) {
-        // Pull the values from the record service and set the variables that are mapped to the LWC component
-        component.set('v.caseStatus', component.get("v.simpleRecord.Status"));
-        component.set('v.caseIsClosed', component.get("v.simpleRecord.IsClosed"));
-    },
     logToConsole : function(component, textToLog) {
         if (component.get('v.loggingEnabled')) {
 	        console.log("Case Timer AURA: " + textToLog);

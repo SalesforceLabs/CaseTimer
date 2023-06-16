@@ -8,6 +8,12 @@ import totalTime from "@salesforce/apex/CaseTimeCount.totalTime";
 import grabSessions from "@salesforce/apex/CaseTimeCount.grabSessions";
 import newSessionManual from "@salesforce/apex/CaseTimeCount.newSessionManual";
 import checkAccess from "@salesforce/apex/CaseTimeCount.checkAccess";
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+
+import CASE_STATUS_FIELD from '@salesforce/schema/Case.Status';
+import CASE_ISCLOSED_FIELD from '@salesforce/schema/Case.IsClosed';
+
+const fields = [CASE_STATUS_FIELD, CASE_ISCLOSED_FIELD]
 
 export default class ServiceConsoleCaseTimer extends LightningElement {
 
@@ -25,6 +31,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     @api hideCmp = false;
     @api cmpHeader;
     @api hideClock = false;
+    @api hideList = false;
     @api allowManual = false;
     @api autoStart = false;
     @api isConsoleNavigation = false;
@@ -80,6 +87,16 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         }
     }
     
+    @wire(getRecord, { recordId: '$recordId', fields})
+    caseRecord({ error, data }) {
+        if(data){
+            this.logToConsole("Case in status " + getFieldValue(data, CASE_STATUS_FIELD) + ", IsClosed: " + getFieldValue(data, CASE_ISCLOSED_FIELD));
+            this.caseStatus = getFieldValue(data, CASE_STATUS_FIELD);
+            this.caseIsClosed = getFieldValue(data, CASE_ISCLOSED_FIELD);
+        } else if (error) {
+            console.error(error);
+        }
+    }
 
     @api
     get paused() {
@@ -97,12 +114,12 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._caseStatus;
     }
 
-    // Called when value in the Aura component is updated
     set caseStatus(value) {
         this.logToConsole("caseStatus: " + value);
         // Before updating the status create a new time entry and use the previous status value
         if (this._caseStatus && this._caseStatus != value)
         {
+            this.timeSaved = true; // Ensures we only save once as this event can be called multiple times
             this.logToConsole("CaseStatus: changed");
             this.stop();
             this.logToConsole("Saving new session " + this.totalMilliseconds);
@@ -115,9 +132,11 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
                     this.timerStartTime = Date.now();
                     this.pausedStartTime = this.timerStartTime;
                     this.manualPause ? this.updateTime() : this.start(); // Only restart the timer if we haven't manually paused before the update of the status
+                    this.timeSaved = false; // Ensures we only save once as this event can be called multiple times
                 })
                 .catch(error => {
                     console.error(error);
+                    this.timeSaved = false; // Ensures we only save once as this event can be called multiple times
                 });
             
         }
@@ -129,7 +148,6 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._IsClosed;
     }
 
-    // Called when value in the Aura component is updated
     set caseIsClosed(value) {
         this.logToConsole("IsClosed: " + value);
         if (value === true && this.stopWhenCaseClosed)
@@ -154,7 +172,7 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
     }
 
     constructor(params){
-        super(params)
+        super();
         // These are important to set the context of 'this' in the callback functions
         this.disconnectedHandler = this.disconnectedHandler.bind(this);
         this.pauseTimer = this.pauseTimer.bind(this);
@@ -180,14 +198,16 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
             if (result) {
                 this.hasAccess = false;
                 this.hideClock = true;
+                this.hideList = true;
                 this.hideCmp = false;
             }
         }).catch(error => {
             this.logToConsole('Error in call to checkAccess() - usually due to no access to the Apex Class. Assign the permission set');
-            this.accessMessage = error.body.message;
+            this.accessMessage = error.body.message + '. If this is the unmanaged version of the package, check the CaseTimeCount Apex class for help.';
             this.hasAccess = false;
             this.hideClock = true;
-            this.hideCmp = false; // For show this component
+            this.hideList = true;
+            this.hideCmp = false; // For showing this error messaging
         })
         
         // For console navigation the tab stays open and the Workspace API allows us to track updates
