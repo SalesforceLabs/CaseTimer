@@ -22,21 +22,7 @@
         });
         
     },
-    // Called when the Case record is updated within the agents session
-    handleRecordUpdated: function(component, event, helper) {
-        var eventParams = event.getParams();
-        helper.logToConsole(component, "Record Update event: " + eventParams.changeType);
-        if(eventParams.changeType === "LOADED" || eventParams.changeType === "CHANGED") {
-           // record is loaded or updated in this session
-            helper.logToConsole(component, "Case in status " + component.get("v.simpleRecord.Status") + ", IsClosed: " + component.get("v.simpleRecord.IsClosed"));
-            helper.updateCaseStatus(component);
-        } 
-        else if(eventParams.changeType === "ERROR") {
-            // there’s an error while loading, saving, or deleting the record
-            helper.logToConsole(component, "event: " + event); //JSON.stringify(event));
-        }
-    },
-    
+   
     onTabCreated : function(component, event, helper) {
         helper.logToConsole(component, "onTabCreated event");
         helper.updateVisibility(component, event.getParam('tabId'));

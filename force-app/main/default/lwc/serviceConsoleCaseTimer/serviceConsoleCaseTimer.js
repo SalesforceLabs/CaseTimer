@@ -8,6 +8,12 @@ import totalTime from "@salesforce/apex/CaseTimeCount.totalTime";
 import grabSessions from "@salesforce/apex/CaseTimeCount.grabSessions";
 import newSessionManual from "@salesforce/apex/CaseTimeCount.newSessionManual";
 import checkAccess from "@salesforce/apex/CaseTimeCount.checkAccess";
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+
+import CASE_STATUS_FIELD from '@salesforce/schema/Case.Status';
+import CASE_ISCLOSED_FIELD from '@salesforce/schema/Case.IsClosed';
+
+const fields = [CASE_STATUS_FIELD, CASE_ISCLOSED_FIELD]
 
 export default class ServiceConsoleCaseTimer extends LightningElement {
 
@@ -81,6 +87,16 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         }
     }
     
+    @wire(getRecord, { recordId: '$recordId', fields})
+    caseRecord({ error, data }) {
+        if(data){
+            this.logToConsole("Case in status " + getFieldValue(data, CASE_STATUS_FIELD) + ", IsClosed: " + getFieldValue(data, CASE_ISCLOSED_FIELD));
+            this.caseStatus = getFieldValue(data, CASE_STATUS_FIELD);
+            this.caseIsClosed = getFieldValue(data, CASE_ISCLOSED_FIELD);
+        } else if (error) {
+            console.error(error);
+        }
+    }
 
     @api
     get paused() {
@@ -98,7 +114,6 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._caseStatus;
     }
 
-    // Called when value in the Aura component is updated
     set caseStatus(value) {
         this.logToConsole("caseStatus: " + value);
         // Before updating the status create a new time entry and use the previous status value
@@ -133,7 +148,6 @@ export default class ServiceConsoleCaseTimer extends LightningElement {
         return this._IsClosed;
     }
 
-    // Called when value in the Aura component is updated
     set caseIsClosed(value) {
         this.logToConsole("IsClosed: " + value);
         if (value === true && this.stopWhenCaseClosed)
